@@ -21,6 +21,8 @@ percent <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
+t<-c("24 hour","12 hour am/pm")
+
 ui <- dashboardPage(
   dashboardHeader
   (
@@ -31,7 +33,12 @@ ui <- dashboardPage(
     width= 650,
     sidebarMenu(
       menuItem("About", tabName="about"),
-      menuItem("Part C", tabName="part_c")
+      menuItem("Part C", tabName="part_c"),
+      menuItem("Time",
+               box(
+                 selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
+               )
+      )
     )
   ),
   dashboardBody(
@@ -81,6 +88,34 @@ ui <- dashboardPage(
 )
 
 server <- function(input, output) {
+  
+  switch_hour<- function(x){
+    c <- x
+    #ifelse(input$Time=="24 hour", c<-paste(c$hour,":00",sep=""), ifelse(c<12, paste(c,":00 AM",sep=""),paste(cc-12,":00 PM",sep = "")))
+    if (input$Time !="24 hour"){
+      c <- ifelse(c<12, paste(c,":00 AM",sep=""),paste(c-12,":00 PM",sep = ""))
+      #code currently has a 0:00am - we need to change that to 12 am.
+      c[c == "0:00 AM"] <- "12:00 AM"
+      c[c == "0:00 PM"] <- "12:00 PM"
+    } else {
+      c<-paste(c,":00",sep="")
+    }
+    c
+  }
+  
+  set_time_factor<-function(x)
+  {
+    time <- x
+    if (input$Time =="24 hour"){
+      temp <- c("0:00","1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00","13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00");
+    }
+    else{
+      temp <- c("12:00 AM", "1:00 AM", "2:00 AM", "3:00 AM", "4:00 AM", "5:00 AM", "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM");
+    }
+    time <- factor(time, levels = temp)
+    
+    time
+  }
   
   output$table_per_year<- DT::renderDataTable(
     DT::datatable({
@@ -191,6 +226,19 @@ server <- function(input, output) {
   }
   )
   
+  output$stacked_bar_per_hour<- renderPlot({
+    temp <- group_by(allData, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
+    "fill 0's in to dataset"
+    temp2[is.na(temp2)] <- 0
+    
+    
+    ggplot(data=temp2, aes(x=month_abb, y=count, fill=mag)) +
+      geom_bar(stat="identity") + 
+      scale_fill_brewer(palette = "Set1")
+    
+  }
+  )
 } 
 
 shinyApp(ui = ui, server = server)
