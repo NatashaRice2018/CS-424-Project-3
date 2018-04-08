@@ -80,6 +80,8 @@ ui <- dashboardPage(
                      plotOutput("stacked_bar_per_month")
                 )
               ),
+    
+              
               fluidRow(
                 box(title = "Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
                     radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
@@ -95,7 +97,16 @@ ui <- dashboardPage(
                 box( title = "Tornados By Hour", solidHeader = TRUE, status = "primary", width = 6,
                      plotOutput("stacked_bar_per_hour")
                 )
-              )
+              ),
+              fluidRow(
+                box(title = "Injuries, fatalities and loss for each year",
+                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_year")
+                    
+                ),
+                box(title = "Injuries, fatalities and loss for each month",
+                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_month")
+                    
+                ))
               
               
             )
@@ -312,6 +323,33 @@ server <- function(input, output) {
     
   }
   )
+  
+  #table and chart showing the injuries, fatalities, loss per month summed over all years
+  output$inj_fat_loss_year <- DT::renderDataTable(
+    DT::datatable({
+      n_inj_year <- aggregate(inj ~ yr, data = my_data, sum)
+      n_fat_year <- aggregate(fat ~ yr, data = my_data, sum)
+      n_loss_year <- aggregate(loss ~ yr, data = my_data, sum)
+      inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
+      inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
+      
+      inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
+      inj_fat_loss_year
+    }))
+  # table and chart showing the injuries, fatalities, loss per hour of the day summed over all years
+  output$inj_fat_loss_month <- DT::renderDataTable(
+    DT::datatable({
+      n_inj_month <- aggregate(inj ~ mo, data = my_data, sum)
+      n_fat_month <- aggregate(fat ~ mo, data = my_data, sum)
+      n_loss_month <- aggregate(loss ~ mo, data = my_data, sum)
+      inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
+      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
+      
+      inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
+      inj_fat_loss_month
+    }))
+  
+  
 } 
 
 shinyApp(ui = ui, server = server)
