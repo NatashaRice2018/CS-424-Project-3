@@ -106,6 +106,10 @@ ui <- dashboardPage(
                 box(title = "Injuries, fatalities and loss for each month",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_month")
                     
+                ),
+                box(title = "Injuries, fatalities and loss for each hour",
+                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
+                    
                 ))
               
               
@@ -324,7 +328,7 @@ server <- function(input, output) {
   }
   )
   
-  #table and chart showing the injuries, fatalities, loss per month summed over all years
+  #table and chart showing the injuries, fatalities, loss  all years
   output$inj_fat_loss_year <- DT::renderDataTable(
     DT::datatable({
       n_inj_year <- aggregate(inj ~ yr, data = my_data, sum)
@@ -336,7 +340,7 @@ server <- function(input, output) {
       inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
       inj_fat_loss_year
     }))
-  # table and chart showing the injuries, fatalities, loss per hour of the day summed over all years
+  # table and chart showing the injuries, fatalities, loss per month summed over all years
   output$inj_fat_loss_month <- DT::renderDataTable(
     DT::datatable({
       n_inj_month <- aggregate(inj ~ mo, data = my_data, sum)
@@ -347,6 +351,19 @@ server <- function(input, output) {
       
       inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
       inj_fat_loss_month
+    }))
+  
+  # table and chart showing the injuries, fatalities, loss per hour summed over all years
+  output$inj_fat_loss_hour <- DT::renderDataTable(
+    DT::datatable({
+      n_inj_hour <- aggregate(inj ~ hour, data = my_data, sum)
+      n_fat_hour <- aggregate(fat ~ hour, data = my_data, sum)
+      n_loss_hour <- aggregate(loss ~ hour, data = my_data, sum)
+      inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
+      
+      inj_fat_loss_hour <- as.data.frame(inj_fat_loss_hour)
+      inj_fat_loss_hour
     }))
   
   
