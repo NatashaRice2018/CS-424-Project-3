@@ -79,7 +79,24 @@ ui <- dashboardPage(
                 box( title = "Tornados By Month", solidHeader = TRUE, status = "primary", width = 6,
                      plotOutput("stacked_bar_per_month")
                 )
+              ),
+              fluidRow(
+                box(title = "Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
+                    radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
+                                 choiceNames = list(
+                                   "Numaric Values",
+                                   "Percentages"
+                                 ),
+                                 choiceValues = list(
+                                   "numb", "perc"
+                                 )),
+                    dataTableOutput("table_per_hour")),
+                
+                box( title = "Tornados By Hour", solidHeader = TRUE, status = "primary", width = 6,
+                     plotOutput("stacked_bar_per_hour")
+                )
               )
+              
               
             )
       
@@ -226,16 +243,66 @@ server <- function(input, output) {
   }
   )
   
+  output$table_per_hour<- DT::renderDataTable(
+    DT::datatable({
+      temp <- group_by(allData, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+      temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
+      "fill 0's in to dataset"
+      temp2[is.na(temp2)] <- 0
+      "get data into correct form"
+      temp3 <- cast(temp2, hour ~ mag, mean, value = "count")
+      
+      "calculate totals"
+      temp3$hour_total <-  rowSums(temp3[2:8])
+      
+      temp3$hour<-switch_hour(temp3$hour)
+      #set a factor for time baised on what clock we are in
+      temp3$hour <- set_time_factor(temp3$hour)
+      
+      "calculate percent for each hour"
+      
+      temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$hour_total)
+      temp3$'0 Percent' <- percent(temp3$`0`/temp3$hour_total)
+      temp3$'1 Percent' <- percent(temp3$`1`/temp3$hour_total)
+      temp3$'2 Percent' <- percent(temp3$`2`/temp3$hour_total)
+      temp3$'3 Percent' <- percent(temp3$`3`/temp3$hour_total)
+      temp3$'4 Percent' <- percent(temp3$`4`/temp3$hour_total)
+      temp3$'5 Percent' <- percent(temp3$`5`/temp3$hour_total)
+      
+      "move the total to last col"
+      temp3 <- temp3%>%select(-hour_total,hour_total)
+      
+      "Remove Col user does not want to see"
+      if(input$table_by_hour_view == "numb")
+      {
+        finalChart <- temp3[-c(9:15)]
+      }
+      else
+      {
+        finalChart <- temp3[-c(2:8)]
+      }
+      
+      finalChart
+    },
+    options = list(pageLength = 12))
+  )
+  
+  
   output$stacked_bar_per_hour<- renderPlot({
-    temp <- group_by(allData, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
-    temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
+    temp <- group_by(allData, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
     "fill 0's in to dataset"
     temp2[is.na(temp2)] <- 0
     
+    temp2$hour<-switch_hour(temp2$hour)
+    #set a factor for time baised on what clock we are in
+    temp2$hour <- set_time_factor(temp2$hour)
     
-    ggplot(data=temp2, aes(x=month_abb, y=count, fill=mag)) +
+    
+    ggplot(data=temp2, aes(x=hour, y=count, fill=mag)) +
       geom_bar(stat="identity") + 
-      scale_fill_brewer(palette = "Set1")
+      scale_fill_brewer(palette = "Set1") +
+      theme(axis.text.x = element_text(angle = 15, hjust = 1))
     
   }
   )
