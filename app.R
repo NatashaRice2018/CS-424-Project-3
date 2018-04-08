@@ -136,7 +136,8 @@ server <- function(input, output) {
   
   output$table_per_year<- DT::renderDataTable(
     DT::datatable({
-      temp <- group_by(allData, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
+      temp <- allData %>% filter(st == "IL")
+      temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
       "fill 0's in to dataset"
       temp2[is.na(temp2)] <- 0
@@ -175,7 +176,8 @@ server <- function(input, output) {
   )
   
   output$stacked_bar_per_year<- renderPlot({
-      temp <- group_by(allData, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp <- allData %>% filter(st == "IL")
+      temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
       "fill 0's in to dataset"
       temp2[is.na(temp2)] <- 0
@@ -191,7 +193,8 @@ server <- function(input, output) {
   
   output$table_per_month<- DT::renderDataTable(
     DT::datatable({
-      temp <- group_by(allData, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
+      temp <- allData %>% filter(st == "IL")
+      temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
       "fill 0's in to dataset"
       temp2[is.na(temp2)] <- 0
@@ -230,7 +233,8 @@ server <- function(input, output) {
   )
   
   output$stacked_bar_per_month<- renderPlot({
-    temp <- group_by(allData, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp <- allData %>% filter(st == "IL")
+    temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
     temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
     "fill 0's in to dataset"
     temp2[is.na(temp2)] <- 0
@@ -245,7 +249,8 @@ server <- function(input, output) {
   
   output$table_per_hour<- DT::renderDataTable(
     DT::datatable({
-      temp <- group_by(allData, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+      temp <- allData %>% filter(st == "IL")
+      temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
       "fill 0's in to dataset"
       temp2[is.na(temp2)] <- 0
@@ -289,7 +294,8 @@ server <- function(input, output) {
   
   
   output$stacked_bar_per_hour<- renderPlot({
-    temp <- group_by(allData, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp <- allData %>% filter(st == "IL")
+    temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
     temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
     "fill 0's in to dataset"
     temp2[is.na(temp2)] <- 0
