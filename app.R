@@ -45,7 +45,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem("about",
               h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu"),
-              a("Link to project website", href="#")
+              a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
       tabItem("part_c",
               fluidRow(
