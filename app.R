@@ -38,6 +38,11 @@ ui <- dashboardPage(
                box(
                  selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
                )
+      ),
+      menuItem("Unit",
+               box(
+                 selectInput("Unit","Miles or Kilometers", choices=c("Miles","Kilometers"), selected = 'Miles'), width=650
+               )
       )
     )
   ),
@@ -80,6 +85,23 @@ ui <- dashboardPage(
                      plotOutput("stacked_bar_per_month")
                 )
               ),
+              fluidRow(
+                box(title = "Tornadoes by distance", solidHeader = TRUE, status = "primary",width = 6,
+                    radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
+                                 choiceNames = list(
+                                   "Numaric Values",
+                                   "Percentages"
+                                 ),
+                                 choiceValues = list(
+                                   "numb", "perc"
+                                 )),
+                    dataTableOutput("table_per_dist")),
+                
+                
+                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 6,
+                     plotOutput("stacked_bar_per_dist")
+                )
+              ) ,
     
               
               fluidRow(
@@ -328,12 +350,118 @@ server <- function(input, output) {
   }
   )
   
+  output$table_per_dist<- DT::renderDataTable(
+    DT::datatable({
+      
+      temp <- allData %>% filter(st == "IL", sg != "-9")
+      latlong <- temp[, c("slon","slat")]
+      temp$dist_From_chi <- distm( latlong, c(-87.63, 41.88), fun = distHaversine)
+      
+      
+      "Convert data to the correct format"
+      if(input$Unit == "Miles")
+      {
+        breaks_milimeters <- c(0, 161900, 250000, 320000, 400000, 480000, 580000 )
+        breaks_miles <- conv_unit(breaks_milimeters , "m", "mi")
+        temp$dist_From_chi = conv_unit(temp$dist_From_chi , "m", "mi")
+        temp$groups = cut(temp$dist_From_chi, breaks_miles)
+        label <- c("0 - 100", "100-150", "151 - 199", "200 - 250", "251 - 300", "300 - 360")
+      }
+      else
+      {
+        breaks_milimeters <- c(0, 161900, 250000, 320000, 400000, 480000, 580000 )
+        breaks_Kmilimeters <- conv_unit(breaks_milimeters , "m", "km")
+        temp$dist_From_chi = conv_unit(temp$dist_From_chi , "m", "km")
+        temp$groups = cut(temp$dist_From_chi, breaks_Kmilimeters)
+        label <- c("0 - 162", "162-250", "251 - 320", "321 - 400", "401 - 480", "481 - 580")
+      }
+      
+      temp <- group_by(temp, groups, mag) %>% summarise(count = n()) %>% group_by(mag)
+      temp2 <- temp %>% complete(groups, mag) %>% group_by(groups) %>% fill(mag)
+      "fill 0's in to dataset"
+      temp2[is.na(temp2)] <- 0
+      
+      temp3 <- cast(temp2, groups ~ mag, mean, value = "count")
+      
+      "calculate totals"
+      temp3$groups_total <-  rowSums(temp3[2:8])
+      
+      
+      "calculate percent for each groups"
+      
+      temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$groups_total)
+      temp3$'0 Percent' <- percent(temp3$`0`/temp3$groups_total)
+      temp3$'1 Percent' <- percent(temp3$`1`/temp3$groups_total)
+      temp3$'2 Percent' <- percent(temp3$`2`/temp3$groups_total)
+      temp3$'3 Percent' <- percent(temp3$`3`/temp3$groups_total)
+      temp3$'4 Percent' <- percent(temp3$`4`/temp3$groups_total)
+      temp3$'5 Percent' <- percent(temp3$`5`/temp3$groups_total)
+      
+      "move the total to last col"
+      temp3 <- temp3%>%select(-groups_total,groups_total)
+      
+      "Remove Col user does not want to see"
+      if(input$table_by_dist_view == "numb")
+      {
+        finalChart <- temp3[-c(9:15)]
+      }
+      else
+      {
+        finalChart <- temp3[-c(2:8)]
+      }
+      
+      finalChart
+      
+      
+    },
+    options = list(pageLength = 12))
+  )
+  
+  output$stacked_bar_per_dist<- renderPlot({
+    temp <- allData %>% filter(st == "IL", sg != "-9")
+    latlong <- temp[, c("slon","slat")]
+    temp$dist_From_chi <- distm( latlong, c(-87.63, 41.88), fun = distHaversine)
+    
+    
+    "Convert data to the correct format"
+    if(input$Unit == "Miles")
+    {
+      breaks_milimeters <- c(0, 161900, 250000, 320000, 400000, 480000, 580000 )
+      breaks_miles <- conv_unit(breaks_milimeters , "m", "mi")
+      temp$dist_From_chi = conv_unit(temp$dist_From_chi , "m", "mi")
+      temp$groups = cut(temp$dist_From_chi, breaks_miles)
+      label <- c("0 - 100", "100-150", "151 - 199", "200 - 250", "251 - 300", "300 - 360")
+    }
+    else
+    {
+      breaks_milimeters <- c(0, 161900, 250000, 320000, 400000, 480000, 580000 )
+      breaks_Kmilimeters <- conv_unit(breaks_milimeters , "m", "km")
+      temp$dist_From_chi = conv_unit(temp$dist_From_chi , "m", "km")
+      temp$groups = cut(temp$dist_From_chi, breaks_Kmilimeters)
+      label <- c("0 - 162", "162-250", "251 - 320", "321 - 400", "401 - 480", "481 - 580")
+    }
+    
+    temp <- group_by(temp, groups, mag) %>% summarise(count = n()) %>% group_by(mag)
+    temp2 <- temp %>% complete(groups, mag) %>% group_by(groups) %>% fill(mag)
+    "fill 0's in to dataset"
+    temp2[is.na(temp2)] <- 0
+    
+    ggplot(data=temp2, aes(x=groups, y=count, fill=mag)) +
+      geom_bar(stat="identity") + 
+      scale_fill_brewer(palette = "Set1") +
+      theme(axis.text.x = element_text(angle = 15, hjust = 1)) +
+      xlab("Distance") + ylab("Count") +
+      scale_x_discrete(breaks= unique(temp2$groups),
+                       labels= label)
+  }
+  )
+  
   #table and chart showing the injuries, fatalities, loss  all years
   output$inj_fat_loss_year <- DT::renderDataTable(
     DT::datatable({
-      n_inj_year <- aggregate(inj ~ yr, data = my_data, sum)
-      n_fat_year <- aggregate(fat ~ yr, data = my_data, sum)
-      n_loss_year <- aggregate(loss ~ yr, data = my_data, sum)
+      n_inj_year <- aggregate(inj ~ yr, data = allData, sum)
+      n_fat_year <- aggregate(fat ~ yr, data = allData, sum)
+      n_loss_year <- aggregate(loss ~ yr, data = allData, sum)
       inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
       inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
       
@@ -343,9 +471,9 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per month summed over all years
   output$inj_fat_loss_month <- DT::renderDataTable(
     DT::datatable({
-      n_inj_month <- aggregate(inj ~ mo, data = my_data, sum)
-      n_fat_month <- aggregate(fat ~ mo, data = my_data, sum)
-      n_loss_month <- aggregate(loss ~ mo, data = my_data, sum)
+      n_inj_month <- aggregate(inj ~ mo, data = allData, sum)
+      n_fat_month <- aggregate(fat ~ mo, data = allData, sum)
+      n_loss_month <- aggregate(loss ~ mo, data = allData, sum)
       inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
       inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
       
@@ -356,9 +484,9 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per hour summed over all years
   output$inj_fat_loss_hour <- DT::renderDataTable(
     DT::datatable({
-      n_inj_hour <- aggregate(inj ~ hour, data = my_data, sum)
-      n_fat_hour <- aggregate(fat ~ hour, data = my_data, sum)
-      n_loss_hour <- aggregate(loss ~ hour, data = my_data, sum)
+      n_inj_hour <- aggregate(inj ~ hour, data = allData, sum)
+      n_fat_hour <- aggregate(fat ~ hour, data = allData, sum)
+      n_loss_hour <- aggregate(loss ~ hour, data = allData, sum)
       inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
       inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
       
