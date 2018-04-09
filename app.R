@@ -471,15 +471,21 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per month summed over all years
   output$inj_fat_loss_month <- DT::renderDataTable(
     DT::datatable({
-      n_inj_month <- aggregate(inj ~ mo, data = allData, sum)
-      n_fat_month <- aggregate(fat ~ mo, data = allData, sum)
-      n_loss_month <- aggregate(loss ~ mo, data = allData, sum)
+      n_inj_month <- aggregate(inj ~ month_abb, data = allData, sum)
+      n_fat_month <- aggregate(fat ~ month_abb, data = allData, sum)
+      n_loss_month <- aggregate(loss ~ month_abb, data = allData, sum)
       inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
       inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
       
       inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
+      
+      
+      
       inj_fat_loss_month
-    }))
+    },
+    options = list(pageLength = 12, order = list(list(1, 'asc')))
+    )
+  )
   
   # table and chart showing the injuries, fatalities, loss per hour summed over all years
   output$inj_fat_loss_hour <- DT::renderDataTable(
@@ -490,9 +496,16 @@ server <- function(input, output) {
       inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
       inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
       
+      inj_fat_loss_hour$hour<-switch_hour(inj_fat_loss_hour$hour)
+      #set a factor for time baised on what clock we are in
+      inj_fat_loss_hour$hour <- set_time_factor(inj_fat_loss_hour$hour)
+      
       inj_fat_loss_hour <- as.data.frame(inj_fat_loss_hour)
       inj_fat_loss_hour
-    }))
+    },
+    options = list(pageLength = 12)
+    )
+  )
   
   
 } 
