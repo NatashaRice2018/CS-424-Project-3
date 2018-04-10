@@ -13,6 +13,9 @@ library(plotly)
 library(tidyverse)
 "Allows us to piviot tables if needed"
 library(reshape)
+"libary that lets us find distances between two LAT, Long"
+library(geosphere)
+library(measurements)
 
 
 allData <- readRDS("tornadoes.rds")
@@ -459,9 +462,10 @@ server <- function(input, output) {
   #table and chart showing the injuries, fatalities, loss  all years
   output$inj_fat_loss_year <- DT::renderDataTable(
     DT::datatable({
-      n_inj_year <- aggregate(inj ~ yr, data = allData, sum)
-      n_fat_year <- aggregate(fat ~ yr, data = allData, sum)
-      n_loss_year <- aggregate(loss ~ yr, data = allData, sum)
+      temp <- allData %>% filter(st == "IL")
+      n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
+      n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
+      n_loss_year <- aggregate(loss ~ yr, data = temp, sum)
       inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
       inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
       
@@ -471,9 +475,10 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per month summed over all years
   output$inj_fat_loss_month <- DT::renderDataTable(
     DT::datatable({
-      n_inj_month <- aggregate(inj ~ month_abb, data = allData, sum)
-      n_fat_month <- aggregate(fat ~ month_abb, data = allData, sum)
-      n_loss_month <- aggregate(loss ~ month_abb, data = allData, sum)
+      temp <- allData %>% filter(st == "IL")
+      n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
+      n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
+      n_loss_month <- aggregate(loss ~ month_abb, data = temp, sum)
       inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
       inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
       
@@ -490,9 +495,10 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per hour summed over all years
   output$inj_fat_loss_hour <- DT::renderDataTable(
     DT::datatable({
-      n_inj_hour <- aggregate(inj ~ hour, data = allData, sum)
-      n_fat_hour <- aggregate(fat ~ hour, data = allData, sum)
-      n_loss_hour <- aggregate(loss ~ hour, data = allData, sum)
+      temp <- allData %>% filter(st == "IL")
+      n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
+      n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
+      n_loss_hour <- aggregate(loss ~ hour, data = temp, sum)
       inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
       inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
       
