@@ -180,6 +180,18 @@ server <- function(input, output) {
     time
   }
   
+  set_paths_by_mag<- function(mag_selected, map, table)
+  {
+    temp_0 = subset(table, mag == mag_selected)
+    for(i in 1:nrow(temp_0)){
+      print(i)
+      map <- addPolylines(map, lat = as.numeric(temp_0[i, c("slat", "elat")]), 
+                          lng = as.numeric(temp_0[i, c("slon", "elon")]))
+    }
+    
+    map
+  }
+  
   output$table_per_year<- DT::renderDataTable(
     DT::datatable({
       temp <- allData %>% filter(st == "IL")
@@ -523,11 +535,12 @@ server <- function(input, output) {
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     map3 = leaflet(temp) %>% addTiles()
     "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
-    for(i in 1:nrow(temp)){
-      print(i)
-      map3 <- addPolylines(map3, lat = as.numeric(temp[i, c("slat", "elat")]), 
-                           lng = as.numeric(temp[i, c("slon", "elon")]))
-    }
+    map3 = set_paths_by_mag(0, map3, temp)
+    map3 = set_paths_by_mag(1, map3, temp)
+    map3 = set_paths_by_mag(2, map3, temp)
+    map3 = set_paths_by_mag(3, map3, temp)
+    map3 = set_paths_by_mag(4, map3, temp)
+    map3 = set_paths_by_mag(5, map3, temp)
     map3
   })
   
