@@ -135,7 +135,13 @@ ui <- dashboardPage(
                 box(title = "Injuries, fatalities and loss for each hour",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
                     
-                ))
+                  )
+                ),
+              fluidRow(
+                box(title = "Leaflet Map", solidHeader = TRUE, status = "primary", width = 6,
+                    leafletOutput("leaf")
+                )
+              )
               
               
             )
@@ -356,7 +362,7 @@ server <- function(input, output) {
   output$table_per_dist<- DT::renderDataTable(
     DT::datatable({
       
-      temp <- allData %>% filter(st == "IL", sg != "-9")
+      temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
       latlong <- temp[, c("slon","slat")]
       temp$dist_From_chi <- distm( latlong, c(-87.63, 41.88), fun = distHaversine)
       
@@ -421,7 +427,7 @@ server <- function(input, output) {
   )
   
   output$stacked_bar_per_dist<- renderPlot({
-    temp <- allData %>% filter(st == "IL", sg != "-9")
+    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     latlong <- temp[, c("slon","slat")]
     temp$dist_From_chi <- distm( latlong, c(-87.63, 41.88), fun = distHaversine)
     
@@ -513,6 +519,17 @@ server <- function(input, output) {
     )
   )
   
+  output$leaf <- renderLeaflet({
+    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
+    map3 = leaflet(temp) %>% addTiles()
+    "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
+    for(i in 1:nrow(temp)){
+      print(i)
+      map3 <- addPolylines(map3, lat = as.numeric(temp[i, c("slat", "elat")]), 
+                           lng = as.numeric(temp[i, c("slon", "elon")]))
+    }
+    map3
+  })
   
 } 
 
