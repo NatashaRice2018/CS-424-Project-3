@@ -37,6 +37,7 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("About", tabName="about"),
       menuItem("Part C", tabName="part_c"),
+      menuItem("Part B", tabName="part_b"),
       menuItem("Time",
                box(
                  selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
@@ -144,13 +145,87 @@ ui <- dashboardPage(
               )
               
               
-            )
+            ),
+      
+      tabItem("part_b",
+              
+              titlePanel("Destruction Parameters"),
+              
+              sidebarPanel(
+                
+                # Input: Simple integer interval ----
+                sliderInput("integer", "Fatalities:",
+                            min = 0, max = 1000,
+                            value = 500),
+                
+                # Input: Decimal interval with step value ----
+                sliderInput("decimal", "Injuries:",
+                            min = 0, max = 1,
+                            value = 0.5, step = 0.1),
+                
+                # Input: Specification of range within an interval ----
+                sliderInput("range", "Duration of Tornado:",
+                            min = 1, max = 1000,
+                            value = c(200,500)),
+                
+                # Input: Custom currency format for with basic animation ----
+                sliderInput("format", "Property Loss Cost:",
+                            min = 0, max = 10000,
+                            value = 0, step = 2500,
+                            pre = "$", sep = ",",
+                            animate = TRUE),
+                
+                # Input: Animation with custom interval (in ms) ----
+                # to control speed, plus looping
+                sliderInput("animation", "Looping Animation:",
+                            min = 1, max = 2000,
+                            value = 1, step = 10,
+                            animate =
+                              animationOptions(interval = 300, loop = TRUE))
+                
+              ),   
+           
+                
+                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 6,
+                    leafletOutput("topDestructive")
+                )
+                
+         
+                )
+                
+             
+              )
+              
+    
+              
+      )
       
     )
-  )
-)
+  
+
 
 server <- function(input, output) {
+  
+  
+  
+  sliderValues <- reactive({
+    
+    print(input$integer)
+    data.frame(
+      Name = c("Integer",
+               "Decimal",
+               "Range",
+               "Custom Format",
+               "Animation"),
+      Value = as.character(c(input$integer,
+                             input$decimal,
+                             paste(input$range, collapse = " "),
+                             input$format,
+                             input$animation)),
+      stringsAsFactors = FALSE)
+    
+  })
+  
   
   switch_hour<- function(x){
     c <- x
@@ -184,7 +259,7 @@ server <- function(input, output) {
   {
     temp_0 = subset(table, mag == mag_selected)
     for(i in 1:nrow(temp_0)){
-      print(i)
+      "print(i)"
       map <- addPolylines(map, lat = as.numeric(temp_0[i, c("slat", "elat")]), 
                           lng = as.numeric(temp_0[i, c("slon", "elon")]))
     }
@@ -349,6 +424,7 @@ server <- function(input, output) {
     },
     options = list(pageLength = 12))
   )
+  
   
   
   output$stacked_bar_per_hour<- renderPlot({
@@ -543,6 +619,21 @@ server <- function(input, output) {
     map3 = set_paths_by_mag(5, map3, temp)
     map3
   })
+  
+  output$topDestructive <- renderLeaflet({
+    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
+    map3 = leaflet(temp) %>% addTiles()
+    "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
+    map3 = set_paths_by_mag(0, map3, temp)
+    map3 = set_paths_by_mag(1, map3, temp)
+    map3 = set_paths_by_mag(2, map3, temp)
+    map3 = set_paths_by_mag(3, map3, temp)
+    map3 = set_paths_by_mag(4, map3, temp)
+    map3 = set_paths_by_mag(5, map3, temp)
+    map3
+  })
+  
+
   
 } 
 
