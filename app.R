@@ -20,6 +20,12 @@ library(measurements)
 
 allData <- readRDS("tornadoes.rds")
 
+fips <- read.table('FIPS code',sep = ',')
+names(fips)[1]<-'st'
+names(fips)[3]<-'f1'
+names(fips)[4]<-'county'
+allData <- merge(allData,fips,by=c('st','f1'))
+
 percent <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
@@ -106,8 +112,7 @@ ui <- dashboardPage(
                      plotOutput("stacked_bar_per_dist")
                 )
               ) ,
-    
-              
+            
               fluidRow(
                 box(title = "Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
                     radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
@@ -137,7 +142,18 @@ ui <- dashboardPage(
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
                     
                   )
-                ),
+                
+              
+      
+               ),
+              fluidRow(
+                box(title = "most hitted counties",
+                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("most_hit_counties")),
+                box(title = "most hitted counties",
+                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("most_hit_counties_bar")
+                    
+                )
+              ),
               fluidRow(
                 box(title = "Leaflet Map", solidHeader = TRUE, status = "primary", width = 6,
                     leafletOutput("leaf")
@@ -606,6 +622,29 @@ server <- function(input, output) {
     options = list(pageLength = 12)
     )
   )
+  
+  #table and chart showing which counties were most hit by tornadoes summed over all years
+  
+  output$most_hit_counties <- DT::renderDataTable(
+    DT::datatable({
+      most_hit_counties <- group_by(temp,county) %>% summarise(count=n()) %>% arrange(desc(count)) %>% top_n(15)
+      most_hit_counties <- as.data.frame(most_hit_counties)
+      most_hit_counties
+    },
+    options = list(pageLength = 12)
+    )
+  )
+  
+  output$most_hit_counties_bar <- renderPlot(
+    {
+      temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
+      temp2<-group_by(temp,county) %>% summarise(count=n()) %>% arrange(desc(count)) %>% top_n(15)
+      temp2$county <- factor(temp2$county,levels=temp2$county)
+      ggplot(data=temp2, aes(x=county, y=count)) +
+        geom_bar(stat="identity")
+    }
+  )
+  
   
   output$leaf <- renderLeaflet({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
