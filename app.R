@@ -160,6 +160,10 @@ ui <- dashboardPage(
                 box(title = "Injuries, fatalities and loss for each hour",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
                     
+                ),
+                box(title = "Injuries, fatalities and loss for each hour",
+                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_hour_line")
+                    
                 )
                 
                 
@@ -621,7 +625,7 @@ server <- function(input, output) {
   })
     
   # table and chart showing the injuries, fatalities, loss per month summed over all years
-  output$inj_fat_loss_month_line <- plotOutput({
+  output$inj_fat_loss_month_line <- renderPlot({
     
       temp <- allData %>% filter(st == "IL")
       n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
@@ -633,10 +637,10 @@ server <- function(input, output) {
       inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
       
       names(inj_fat_loss_month)[1]<-'Month'
-      inj_fat_loss_month$Month <- factor(inj_fat_loss_month$Month,levels=inj_fat_loss_month$Month)
+      inj_fat_loss_month<-inj_fat_loss_month[order(match(inj_fat_loss_month$Month, month.abb)), ]
       dat.m <- melt(inj_fat_loss_month, "Month")
       
-      ggplot(dat.m, aes(Month, value, colour = variable)) + geom_line() +
+      ggplot(dat.m, aes(Month, value, colour = variable)) + geom_line(aes(colour=variable,group=variable)) +
         facet_wrap(~ variable, ncol = 1, scales = "free_y")
       
     
@@ -680,6 +684,30 @@ server <- function(input, output) {
     },
     options = list(pageLength = 12)
     )
+  )
+  
+  output$inj_fat_loss_hour_line <- renderPlot(
+    {
+      temp <- allData %>% filter(st == "IL")
+      n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
+      n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
+      n_loss_hour <- aggregate(loss ~ hour, data = temp, sum)
+      inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
+      
+      inj_fat_loss_hour$hour<-switch_hour(inj_fat_loss_hour$hour)
+      #set a factor for time baised on what clock we are in
+      inj_fat_loss_hour$hour <- set_time_factor(inj_fat_loss_hour$hour)
+      
+      inj_fat_loss_hour <- as.data.frame(inj_fat_loss_hour)
+      names(inj_fat_loss_hour)[1]<-'Hour'
+      
+      dat.m <- melt(inj_fat_loss_hour, "Hour")
+      
+      ggplot(dat.m, aes(Hour, value, colour = variable)) + geom_line(aes(colour=variable,group=variable)) +
+        facet_wrap(~ variable, ncol = 1, scales = "free_y")
+      
+    }
   )
   
   #table and chart showing which counties were most hit by tornadoes summed over all years
