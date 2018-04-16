@@ -44,6 +44,9 @@ ui <- dashboardPage(
       menuItem("About", tabName="about"),
       menuItem("Part C", tabName="part_c"),
       menuItem("Part B", tabName="part_b"),
+      menuItem("Number of Tornadoes", tabName="number_of_tornadoes"),
+      menuItem("Injuries, Fatalities, Losses", tabName="injuries_fatalities_losses"),
+      menuItem("Tornado Damage", tabName="tornado_damage"),
       menuItem("Time",
                box(
                  selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
@@ -57,12 +60,16 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    tags$head(
+      tags$link(rel="stylesheet", type="text/css", href="custom.css")
+    ),
+    
     tabItems(
       tabItem("about",
               h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu"),
               a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
-      tabItem("part_c",
+      tabItem("number_of_tornadoes",
               fluidRow(
                 box(title = "Tornadoes by year", solidHeader = TRUE, status = "primary",width = 6,
                     radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
@@ -128,7 +135,9 @@ ui <- dashboardPage(
                 box( title = "Tornados By Hour", solidHeader = TRUE, status = "primary", width = 6,
                      plotOutput("stacked_bar_per_hour")
                 )
-              ),
+              )
+      ),
+      tabItem("injuries_fatalities_losses",
               fluidRow(
                 box(title = "Injuries, fatalities and loss for each year",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_year")
@@ -142,9 +151,6 @@ ui <- dashboardPage(
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
                     
                   )
-                
-              
-      
                ),
               fluidRow(
                 box(title = "most hitted counties",
@@ -163,7 +169,7 @@ ui <- dashboardPage(
               
             ),
       
-      tabItem("part_b",
+      tabItem("tornado_damage",
               
               titlePanel("Destruction Parameters"),
               
@@ -205,8 +211,6 @@ ui <- dashboardPage(
                 box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 6,
                     leafletOutput("topDestructive")
                 )
-                
-         
                 )
                 
              
