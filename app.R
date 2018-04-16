@@ -42,8 +42,6 @@ ui <- dashboardPage(
     width= 650,
     sidebarMenu(
       menuItem("About", tabName="about"),
-      menuItem("Part C", tabName="part_c"),
-      menuItem("Part B", tabName="part_b"),
       menuItem("Number of Tornadoes", tabName="number_of_tornadoes"),
       menuItem("Injuries, Fatalities, Losses", tabName="injuries_fatalities_losses"),
       menuItem("Tornado Damage", tabName="tornado_damage"),
@@ -140,11 +138,11 @@ ui <- dashboardPage(
       tabItem("injuries_fatalities_losses",
               fluidRow(
                 box(title = "Injuries, fatalities and loss for each year",
-                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_year")
+                    solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_year")
                     
                 ),
                 box(title = "Injuries, fatalities and loss for each year",
-                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_year_line")
+                    solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_year_line")
                     
                 )
                 
@@ -153,11 +151,11 @@ ui <- dashboardPage(
               fluidRow(
 
                 box(title = "Injuries, fatalities and loss for each month",
-                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_month")
+                    solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_month")
                     
                 ),
                 box(title = "Injuries, fatalities and loss for each month",
-                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_month_line")
+                    solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_month_line")
                     
                 )
                 
@@ -167,11 +165,11 @@ ui <- dashboardPage(
               
     
                 box(title = "Injuries, fatalities and loss for each hour",
-                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
+                    solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour")
                     
                 ),
                 box(title = "Injuries, fatalities and loss for each hour",
-                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_hour_line")
+                    solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_hour_line")
                     
                 )
                 
@@ -179,74 +177,74 @@ ui <- dashboardPage(
                 
               ),
               fluidRow(
-                box(title = "most hitted counties",
-                    solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("most_hit_counties")),
-                box(title = "most hitted counties",
-                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("most_hit_counties_bar")
+                box(title = "Most Hit Counties",
+                    solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("most_hit_counties")),
+                box(title = "Most Hit Counties",
+                    solidHeader = TRUE, status = "primary",width = 6,plotOutput("most_hit_counties_bar")
                     
                 )
               ),
               fluidRow(
-                box(title = "Leaflet Map", solidHeader = TRUE, status = "primary", width = 6,
+                box(title = "Tornado Paths", solidHeader = TRUE, status = "primary", width = 6,
                     leafletOutput("leaf")
                 )
               )
-              
               
             ),
       
       tabItem("tornado_damage",
               
-              titlePanel("Destruction Parameters"),
-              
-              sidebarPanel(
+              fluidRow(
+                titlePanel("Destruction Parameters"),
                 
-                # Input: Simple integer interval ----
-                sliderInput("integer", "Fatalities:",
-                            min = 0, max = 1000,
-                            value = 500),
-                
-                # Input: Decimal interval with step value ----
-                sliderInput("decimal", "Injuries:",
-                            min = 0, max = 1,
-                            value = 0.5, step = 0.1),
-                
-                # Input: Specification of range within an interval ----
-                sliderInput("range", "Duration of Tornado:",
-                            min = 1, max = 1000,
-                            value = c(200,500)),
-                
-                # Input: Custom currency format for with basic animation ----
-                sliderInput("format", "Property Loss Cost:",
-                            min = 0, max = 10000,
-                            value = 0, step = 2500,
-                            pre = "$", sep = ",",
-                            animate = TRUE),
-                
-                # Input: Animation with custom interval (in ms) ----
-                # to control speed, plus looping
-                sliderInput("animation", "Looping Animation:",
-                            min = 1, max = 2000,
-                            value = 1, step = 10,
-                            animate =
-                              animationOptions(interval = 300, loop = TRUE))
-                
-              ),   
-           
-                
+                sidebarPanel(
+                  
+                  # Input: Simple integer interval ----
+                  sliderInput("integer", "Fatalities:",
+                              min = 0, max = 1000,
+                              value = 500),
+                  
+                  # Input: Decimal interval with step value ----
+                  sliderInput("decimal", "Injuries:",
+                              min = 0, max = 1,
+                              value = 0.5, step = 0.1),
+                  
+                  # Input: Specification of range within an interval ----
+                  sliderInput("range", "Duration of Tornado:",
+                              min = 1, max = 1000,
+                              value = c(200,500)),
+                  
+                  # Input: Custom currency format for with basic animation ----
+                  sliderInput("format", "Property Loss Cost:",
+                              min = 0, max = 10000,
+                              value = 0, step = 2500,
+                              pre = "$", sep = ",",
+                              animate = TRUE),
+                  
+                  # Input: Animation with custom interval (in ms) ----
+                  # to control speed, plus looping
+                  sliderInput("animation", "Looping Animation:",
+                              min = 1, max = 2000,
+                              value = 1, step = 10,
+                              animate =
+                                animationOptions(interval = 300, loop = TRUE))
+                  
+                ),   
+                  
                 box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 6,
                     leafletOutput("topDestructive")
                 )
-                )
+              ) # end of fluid row
+      )
                 
              
-              )
+    )
               
     
               
-      )
+  )
       
-    )
+)
   
 
 
