@@ -134,18 +134,37 @@ ui <- dashboardPage(
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_year")
                     
                 ),
+                box(title = "Injuries, fatalities and loss for each year",
+                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_year_line")
+                    
+                )
+                
+      
+               ),
+              fluidRow(
+
                 box(title = "Injuries, fatalities and loss for each month",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_month")
                     
                 ),
+                box(title = "Injuries, fatalities and loss for each month",
+                    solidHeader = TRUE, status = "primary",width = 8,plotOutput("inj_fat_loss_month_line")
+                    
+                )
+                
+                
+              ),
+              fluidRow(
+              
+    
                 box(title = "Injuries, fatalities and loss for each hour",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("inj_fat_loss_hour")
                     
-                  )
+                )
                 
-              
-      
-               ),
+                
+                
+              ),
               fluidRow(
                 box(title = "most hitted counties",
                     solidHeader = TRUE, status = "primary",width = 8,dataTableOutput("most_hit_counties")),
@@ -582,7 +601,47 @@ server <- function(input, output) {
       inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
       inj_fat_loss_year
     }))
+  
+  output$inj_fat_loss_year_line <- renderPlot({
+    temp <- allData %>% filter(st == "IL")
+    n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
+    n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
+    n_loss_year <- aggregate(loss ~ yr, data = temp, sum)
+    inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
+    inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
+    
+    inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
+    
+    names(inj_fat_loss_year)[1]<-'Year'
+    
+    dat.m <- melt(inj_fat_loss_year, "Year")
+    
+    ggplot(dat.m, aes(Year, value, colour = variable)) + geom_line() +
+      facet_wrap(~ variable, ncol = 1, scales = "free_y")
+  })
+    
   # table and chart showing the injuries, fatalities, loss per month summed over all years
+  output$inj_fat_loss_month_line <- plotOutput({
+    
+      temp <- allData %>% filter(st == "IL")
+      n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
+      n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
+      n_loss_month <- aggregate(loss ~ month_abb, data = temp, sum)
+      inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
+      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
+      
+      inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
+      
+      names(inj_fat_loss_month)[1]<-'Month'
+      inj_fat_loss_month$Month <- factor(inj_fat_loss_month$Month,levels=inj_fat_loss_month$Month)
+      dat.m <- melt(inj_fat_loss_month, "Month")
+      
+      ggplot(dat.m, aes(Month, value, colour = variable)) + geom_line() +
+        facet_wrap(~ variable, ncol = 1, scales = "free_y")
+      
+    
+ } )
+  
   output$inj_fat_loss_month <- DT::renderDataTable(
     DT::datatable({
       temp <- allData %>% filter(st == "IL")
@@ -627,6 +686,7 @@ server <- function(input, output) {
   
   output$most_hit_counties <- DT::renderDataTable(
     DT::datatable({
+      temp <- allData %>% filter(st == "IL")
       most_hit_counties <- group_by(temp,county) %>% summarise(count=n()) %>% arrange(desc(count)) %>% top_n(15)
       most_hit_counties <- as.data.frame(most_hit_counties)
       most_hit_counties
