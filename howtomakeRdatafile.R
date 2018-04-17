@@ -16,6 +16,12 @@ allData$time_24hr <- allData$time"
 "Want to factor magnitude so we get null values if applicapable"
 allData$mag <- factor(allData$mag, levels = c(-9, 0, 1, 2, 3, 4, 5))
 
+fips <- read.table('FIPS code',sep = ',')
+names(fips)[1]<-'st'
+names(fips)[3]<-'f1'
+names(fips)[4]<-'county'
+allData <- merge(allData,fips,by=c('st','f1'))
+
 
 "!!!!!If any other vairables are needed for the structure add the lines here and create a new version of the .rds file!!!!!"
 

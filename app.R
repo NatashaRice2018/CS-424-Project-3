@@ -20,11 +20,6 @@ library(measurements)
 
 allData <- readRDS("tornadoes.rds")
 
-fips <- read.table('FIPS code',sep = ',')
-names(fips)[1]<-'st'
-names(fips)[3]<-'f1'
-names(fips)[4]<-'county'
-allData <- merge(allData,fips,by=c('st','f1'))
 
 percent <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
