@@ -750,13 +750,20 @@ server <- function(input, output) {
   output$topDestructive <- renderLeaflet({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     map3 = leaflet(temp) %>% addTiles()
+    "create a list for all magnitude groups"
+    l <- vector("list", nrow(temp))
     "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
-    map3 = set_paths_by_mag(0, map3, temp)
-    map3 = set_paths_by_mag(1, map3, temp)
-    map3 = set_paths_by_mag(2, map3, temp)
-    map3 = set_paths_by_mag(3, map3, temp)
-    map3 = set_paths_by_mag(4, map3, temp)
-    map3 = set_paths_by_mag(5, map3, temp)
+    for(i in 1:nrow(temp)){
+      "print(i)"
+      map3 <- addPolylines(map3, lat = as.numeric(temp[i, c("slat", "elat")]), 
+                          lng = as.numeric(temp[i, c("slon", "elon")]), group = paste("Magnitude ",temp[i,"mag"]))
+      l[[i]] <- (paste("Magnitude ",temp[i,"mag"]))
+    }
+    map3 = map3 %>% 
+      addLayersControl(
+        overlayGroups = unique(l),
+        options = layersControlOptions(collapsed = FALSE)
+      )
     map3
   })
   
