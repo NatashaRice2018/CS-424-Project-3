@@ -749,7 +749,15 @@ server <- function(input, output) {
   
   output$topDestructive <- renderLeaflet({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
-    map3 = leaflet(temp) %>% addTiles()
+    
+    "All options for map views"
+
+    map3 = leaflet(temp) %>% addTiles(group = "OSM (default)") %>% 
+    addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+      addProviderTiles(providers$Stamen.Terrain, group = "Terrain")  %>%
+      addProviderTiles(providers$Stamen.Watercolor, group = "Watercolor")
+    
+    
     "create a list for all magnitude groups"
     l <- vector("list", nrow(temp))
     "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
@@ -761,6 +769,7 @@ server <- function(input, output) {
     }
     map3 = map3 %>% 
       addLayersControl(
+        baseGroups = c("OSM (default)", "Toner", "Terrain", "Watercolor" ),
         overlayGroups = unique(l),
         options = layersControlOptions(collapsed = FALSE)
       )
