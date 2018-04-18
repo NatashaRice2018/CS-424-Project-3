@@ -751,6 +751,7 @@ server <- function(input, output) {
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     
     "All options for map views"
+    "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
 
     map3 = leaflet(temp) %>% addTiles(group = "OSM (default)") %>% 
     addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
