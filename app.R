@@ -636,14 +636,17 @@ server <- function(input, output) {
   # table and chart showing the injuries, fatalities, loss per month summed over all years
   output$inj_fat_loss_month_line <- renderPlot({
     
-      temp <- allData %>% filter(st == "IL")
-      n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
-      n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
-      n_loss_month <- aggregate(loss ~ month_abb, data = temp, sum)
-      inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
-      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
-      
-      inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
+    temp <- allData %>% filter(st == "IL")
+    n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
+    n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
+    n_loss_month_min <- aggregate(loss_min ~ month_abb, data = temp, sum)
+    n_loss_month_max <- aggregate(loss_max ~ month_abb, data = temp, sum)
+    
+    inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
+    inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month_min)
+    inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month_max)
+    
+    inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
       
       names(inj_fat_loss_month)[1]<-'Month'
       inj_fat_loss_month<-inj_fat_loss_month[order(match(inj_fat_loss_month$Month, month.abb)), ]
@@ -660,9 +663,12 @@ server <- function(input, output) {
       temp <- allData %>% filter(st == "IL")
       n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
       n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
-      n_loss_month <- aggregate(loss ~ month_abb, data = temp, sum)
+      n_loss_month_min <- aggregate(loss_min ~ month_abb, data = temp, sum)
+      n_loss_month_max <- aggregate(loss_max ~ month_abb, data = temp, sum)
+      
       inj_fat_loss_month <- merge(n_inj_month,n_fat_month)
-      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month)
+      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month_min)
+      inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month_max)
       
       inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
       
@@ -680,9 +686,12 @@ server <- function(input, output) {
       temp <- allData %>% filter(st == "IL")
       n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
       n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
-      n_loss_hour <- aggregate(loss ~ hour, data = temp, sum)
+      n_loss_hour_min <- aggregate(loss_min ~ hour, data = temp, sum)
+      n_loss_hour_max <- aggregate(loss_max ~ hour, data = temp, sum)
+      
       inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
-      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour_min)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour_max)
       
       inj_fat_loss_hour$hour<-switch_hour(inj_fat_loss_hour$hour)
       #set a factor for time baised on what clock we are in
@@ -700,9 +709,12 @@ server <- function(input, output) {
       temp <- allData %>% filter(st == "IL")
       n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
       n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
-      n_loss_hour <- aggregate(loss ~ hour, data = temp, sum)
+      n_loss_hour_min <- aggregate(loss_min ~ hour, data = temp, sum)
+      n_loss_hour_max <- aggregate(loss_max ~ hour, data = temp, sum)
+      
       inj_fat_loss_hour <- merge(n_inj_hour,n_fat_hour)
-      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour_min)
+      inj_fat_loss_hour <- merge(inj_fat_loss_hour,n_loss_hour_max)
       
       inj_fat_loss_hour$hour<-switch_hour(inj_fat_loss_hour$hour)
       #set a factor for time baised on what clock we are in
