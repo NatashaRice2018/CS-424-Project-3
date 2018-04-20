@@ -27,6 +27,9 @@ percent <- function(x, digits = 2, format = "f", ...) {
 
 t<-c("24 hour","12 hour am/pm")
 
+
+
+
 ui <- dashboardPage(
   dashboardHeader
   (
@@ -598,9 +601,12 @@ server <- function(input, output) {
       temp <- allData %>% filter(st == "IL")
       n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
       n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
-      n_loss_year <- aggregate(loss ~ yr, data = temp, sum)
+      n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
+      n_loss_year_max <- aggregate(loss_max ~ yr, data = temp, sum)
+      
       inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
-      inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
+      inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_min)
+      inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_max)
       
       inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
       inj_fat_loss_year
@@ -610,9 +616,12 @@ server <- function(input, output) {
     temp <- allData %>% filter(st == "IL")
     n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
     n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
-    n_loss_year <- aggregate(loss ~ yr, data = temp, sum)
+    n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
+    n_loss_year_max <- aggregate(loss_max ~ yr, data = temp, sum)
+    
     inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
-    inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year)
+    inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_min)
+    inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_max)
     
     inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
     
