@@ -17,6 +17,10 @@ library(reshape)
 library(geosphere)
 library(measurements)
 
+library(RColorBrewer)
+library(scales)
+library(lattice)
+library(sp)
 
 allData <- readRDS("tornadoes.rds")
 
@@ -39,6 +43,28 @@ t<-c("24 hour","12 hour am/pm")
 
 comp_state_full <- "Texas"
 
+# Choices for drop-downs
+vars <- c(
+  "Magnitude" = "mag",
+  "Width" = "wid",
+  "Loss" = "loss",
+  "Injuries" = "inj",
+  "Fatalities" = "fat",
+  "Length" = "len"
+)
+
+mapView <- c(
+  "Plain" = "OpenStreetMap.DE",
+  "Plain (Black/White)" = "OpenStreetMap.BlackAndWhite",
+  "Dark" = "CartoDB.DarkMatter",
+  "Electricity" = "NASAGIBS.ViirsEarthAtNight2012",
+  "Topoligical" = "OpenTopoMap",
+  "Cities/Towns" = "Hydda.Full",
+  "Realistic" = "Esri.WorldImagery",
+  "Rivers" = "Esri.OceanBasemap",
+  "Fun" = "Thunderforest.SpinalMap"
+)
+
 ui <- dashboardPage(
   dashboardHeader
   (
@@ -51,6 +77,7 @@ ui <- dashboardPage(
       menuItem("About", tabName="about"),
       menuItem("Number of Tornadoes", tabName="number_of_tornadoes"),
       menuItem("Injuries, Fatalities, Losses", tabName="injuries_fatalities_losses"),
+      menuItem("View Tornado Tracks", tabName = "tornado_lines"),
       menuItem("Tornado Damage", tabName="tornado_damage"),
       menuItem("Time",
                box(
@@ -196,14 +223,9 @@ ui <- dashboardPage(
                     solidHeader = TRUE, status = "primary",width = 6,plotOutput("most_hit_counties_bar")
                     
                 )
-              ),
-              fluidRow(
-                box(title = "Tornado Paths", solidHeader = TRUE, status = "primary", width = 6,
-                    leafletOutput("leaf")
-                )
               )
-              
             ),
+      
       
       tabItem("tornado_damage",
               
@@ -265,6 +287,65 @@ ui <- dashboardPage(
                      plotOutput("stacked_bar_per_dist")
                 )
               ) 
+      ),
+      tabItem("tornado_lines",
+               div(class="outer",
+                   
+                   tags$head(
+                     # Include our custom CSS
+                     includeCSS("styles.css"),
+                     includeScript("gomap.js")
+                   ),
+                   
+                   # If not using custom CSS, set height of leafletOutput to a number instead of percent
+                   leafletOutput("map", width="100%", height="100%"),
+                   
+                   # Shiny versions prior to 0.11 should use class = "modal" instead.
+                   absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                 draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
+                                 width = 330, height = "auto",
+                                 
+                                 h2("Tornado Views"),
+                                 selectInput("map", "MAp Type", mapView, selected = "Plain"),
+                                 selectInput("state", "State", unique(allData$st), selected = "IL"),
+                                 illdata = allData %>% filter(st == verbatimTextOutput("state")),
+                                 checkboxInput("county", "View by Couny", value = F),
+                                 conditionalPanel("input.county", uiOutput("countiesList")),
+                                 selectInput("color", "Color", vars, selected = "mag"),
+                                 selectInput("size", "Size", vars, selected = "wid"),
+                                 #filter all data by stte here
+                                 
+                                 sliderInput("width", "Width", min(illdata$wid), max(illdata$wid),
+                                             value = range(illdata$wid), step = 1.0
+                                 ),
+                                 sliderInput("length", "Length", min(illdata$len), max(illdata$len),
+                                             value = range(illdata$len), step = 1.0
+                                 ),
+                                 sliderInput("loss", "loss", min(illdata$loss), max(illdata$loss),
+                                             value = range(illdata$loss), step = 1.0
+                                 ),
+                                 sliderInput("fat", "Fatility", min(illdata$fat), max(illdata$fat),
+                                             value = range(illdata$fat), step = 1.0
+                                 ),
+                                 sliderInput("injuries", "Injuries", min(illdata$inj), max(illdata$inj),
+                                             value = range(illdata$inj), step = 10.0
+                                 ),
+                                 sliderInput("year", "Year", min(illdata$yr), max(illdata$yr),
+                                             value = range(illdata$yr), step = 1.0, sep = ""
+                                 ),
+                                 checkboxGroupInput("magnitude", 
+                                                    h3("Magnitudes to Filter by"), 
+                                                    choices = list("Magnitude 0" = 0, 
+                                                                   "Magnitude 1" = 1, 
+                                                                   "Magnitude 2" = 2, 
+                                                                   "Magnitude 3" = 3,
+                                                                   "Magnitude 4" = 4, 
+                                                                   "Magnitude 5" = 5),
+                                                    selected = c(0, 1, 2, 3, 4, 5))
+                                 
+                                 
+                   )
+               )
       )
                 
              
@@ -299,6 +380,27 @@ server <- function(input, output) {
       stringsAsFactors = FALSE)
     
   })
+  
+  output$state <- renderPrint({
+    input$state
+  })
+  
+  output$countiesList <- renderPrint({
+    temp <- filteredData()
+    temp$county
+    selectInput("selCounty", "Select County", unique(temp$county))
+  })
+  
+  
+  ## Interactive Map ###########################################
+  filteredData <- reactive({ allData[ allData$wid >= input$width[1] & allData$wid <= input$width[2] &
+                                        allData$len >= input$length[1] & allData$len <= input$length[2] &
+                                        allData$loss >= input$loss[1] & allData$loss <= input$loss[2] &
+                                        allData$fat >= input$fat[1] & allData$fat <= input$fat[2] &
+                                        allData$inj >= input$injuries[1] & allData$inj <= input$injuries[2] &
+                                        allData$yr >= input$year[1] & allData$yr <= input$year[2] &
+                                        allData$mag %in% input$magnitude &
+                                        allData$st == input$state, ]})
   
   
   switch_hour<- function(x){
@@ -830,17 +932,80 @@ server <- function(input, output) {
   )
   
   
-  output$leaf <- renderLeaflet({
-    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
-    map3 = leaflet(temp) %>% addTiles()
-    "map3 %>% addMarkers(~elon, ~elat, popup = ~date_time)"
-    map3 = set_paths_by_mag(0, map3, temp)
-    map3 = set_paths_by_mag(1, map3, temp)
-    map3 = set_paths_by_mag(2, map3, temp)
-    map3 = set_paths_by_mag(3, map3, temp)
-    map3 = set_paths_by_mag(4, map3, temp)
-    map3 = set_paths_by_mag(5, map3, temp)
-    map3
+  # Create the map
+  output$map <- renderLeaflet({
+    leaflet() %>%
+      addTiles(
+        urlTemplate = "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"
+      ) %>%
+      setView(lng = -93.85, lat = 37.45, zoom = 4)
+  })
+  
+  
+  observe({
+    colorBy <- input$color
+    sizeBy <- input$size
+    
+    filtered = filteredData()
+    
+    temp <- filtered %>% filter(elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
+    "filter by county if selected"
+    if(input$county) {
+      temp <- temp %>%  filter(county == input$selCounty)
+      
+    }
+    if(nrow(temp) == 0)
+    {
+      map = leafletProxy("map", data = temp) %>%
+        clearShapes() 
+      return()
+    }
+    "Magnitudes are set by factor so they are unique"
+    if(colorBy == "mag")
+    {
+      colorData <- temp[[colorBy]]
+      pal <- colorFactor("Set1", colorData)
+    }
+    else{
+      colorData <- temp[[colorBy]]
+      pal <- colorBin("Set1", colorData, 7, pretty = TRUE)
+    }
+    if(sizeBy == "mag")
+    {
+      weightCalc <- (as.numeric(temp[[sizeBy]]) + 1 ) / max((as.numeric(temp[[sizeBy]]) + 1) )* 15
+    }
+    else{
+      weightCalc <- (temp[[sizeBy]] +1 ) / max((temp[[sizeBy]] + 1 )) * 50
+    }
+    
+    "temp <- illdata %>% filter(elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)"
+    id  <- rownames(temp)
+    
+    temp$id <- id
+    
+    flights_lines <- apply(temp, 1,function(x){
+      points <- data.frame(lng=as.numeric(c(x["slon"], 
+                                            x["elon"])),
+                           lat=as.numeric(c(x["slat"], 
+                                            x["elat"])))
+      coordinates(points) <- c("lng","lat")
+      Lines(Line(points),ID=x["id"])
+    })
+    
+    flights_lines <- SpatialLinesDataFrame(SpatialLines(flights_lines),temp)
+    
+    map = leafletProxy("map", data = temp) %>%
+      clearShapes() %>%
+      addProviderTiles(input$map) %>%
+      addPolylines(data=flights_lines, weight = weightCalc, color = pal(colorData))
+    
+    
+    map = map  %>%
+      addLegend("bottomleft", pal=pal, values=colorData, title=colorBy,
+                layerId="colorLegend")
+    
+    print("done")
+    
   })
   
   output$topDestructive <- renderLeaflet({
