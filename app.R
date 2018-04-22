@@ -28,7 +28,16 @@ percent <- function(x, digits = 2, format = "f", ...) {
 t<-c("24 hour","12 hour am/pm")
 
 
+                  #tabPanel("Tornados By Hour",
+                           #tabBox(
+                             #tabPanel("Table",
+                             #),
+                             #tabPanel("Chart",
+                             #)
+                  #)
+                 #)
 
+comp_state_full <- "Texas"
 
 ui <- dashboardPage(
   dashboardHeader
@@ -66,113 +75,119 @@ ui <- dashboardPage(
               a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
       tabItem("number_of_tornadoes",
-              fluidRow(
-                box(title = "Tornadoes by year", solidHeader = TRUE, status = "primary",width = 6,
-                    radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
-                                 choiceNames = list(
-                                   "Numaric Values",
-                                   "Percentages"
-                                 ),
-                                 choiceValues = list(
-                                   "numb", "perc"
-                                 )),
-                    dataTableOutput("table_per_year")),
-                
-                box( title = "Tornados By Year", solidHeader = TRUE, status = "primary", width = 6,
-                     plotOutput("stacked_bar_per_year")
-                )
-              ),
-              fluidRow(
-                box(title = "Tornadoes by Month", solidHeader = TRUE, status = "primary",width = 6,
-                    radioButtons("table_by_month_view", "Choose one:",  inline = TRUE,
-                                 choiceNames = list(
-                                   "Numaric Values",
-                                   "Percentages"
-                                 ),
-                                 choiceValues = list(
-                                   "numb", "perc"
-                                 )),
-                    dataTableOutput("table_per_month")),
-                
-                box( title = "Tornados By Month", solidHeader = TRUE, status = "primary", width = 6,
-                     plotOutput("stacked_bar_per_month")
-                )
-              ),
-              fluidRow(
-                box(title = "Tornadoes by distance", solidHeader = TRUE, status = "primary",width = 6,
-                    radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
-                                 choiceNames = list(
-                                   "Numaric Values",
-                                   "Percentages"
-                                 ),
-                                 choiceValues = list(
-                                   "numb", "perc"
-                                 )),
-                    dataTableOutput("table_per_dist")),
-                
-                
-                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 6,
-                     plotOutput("stacked_bar_per_dist")
-                )
-              ) ,
+              fluidRow(width=12,
+               #column(width=12,
+                tabBox(width=3,
+                  tabPanel("Tornados By Year", 
+                     tabBox(width=12,
+                       tabPanel("Table",
+                        box(title = "Illinois Tornados By Year", solidHeader = TRUE, status = "primary",width = 6,
+                            radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
+                                         choiceNames = list(
+                                           "Numaric Values",
+                                           "Percentages"
+                                         ),
+                                         choiceValues = list(
+                                           "numb", "perc"
+                                         )),
+                            dataTableOutput("table_per_year")),
+                        box(title = paste(comp_state_full," Tornados By Year"), solidHeader = TRUE, status = "primary",width = 6,
+                            radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
+                                         choiceNames = list(
+                                           "Numaric Values",
+                                           "Percentages"
+                                         ),
+                                         choiceValues = list(
+                                           "numb", "perc"
+                                         )),
+                            dataTableOutput("table_per_year_comp_state"))
+                       ),
+                       tabPanel("Chart",
+                        fluidRow(
+                          box( title = "Illinois Tornados By Year", solidHeader = TRUE, status = "primary", width = 12,
+                               plotOutput("stacked_bar_per_year")
+                          )
+                        ),
+                        fluidRow(
+                          box( title = paste(comp_state_full," Tornados By Year"), solidHeader = TRUE, status = "primary", width = 12,
+                               plotOutput("stacked_bar_per_year_comp_state")
+                          )
+                        )
+                       )
+                    )
+                  ),
+                  tabPanel("Tornados By Month",
+                     tabBox(width=12,
+                       tabPanel("Table",
+                        box(title = "Tornadoes by Month", solidHeader = TRUE, status = "primary",width = 6,
+                            radioButtons("table_by_month_view", "Choose one:",  inline = TRUE,
+                                         choiceNames = list(
+                                           "Numaric Values",
+                                           "Percentages"
+                                         ),
+                                         choiceValues = list(
+                                           "numb", "perc"
+                                         )),
+                            dataTableOutput("table_per_month"))
+                       ),
+                       tabPanel("Chart",
+                          box( title = "Tornados By Month", solidHeader = TRUE, status = "primary", width = 6,
+                               plotOutput("stacked_bar_per_month")
+                          )
+                       )
+                     )
+                 ),
+                 
+                  tabPanel("Tornados By Hour",
+                           tabBox(width=12,
+                             tabPanel("Table",
+                                box(title = "Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
+                                    radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
+                                                 choiceNames = list(
+                                                   "Numaric Values",
+                                                   "Percentages"
+                                                 ),
+                                                 choiceValues = list(
+                                                   "numb", "perc"
+                                                 )),
+                                    dataTableOutput("table_per_hour"))
+                             ),
+                             tabPanel("Chart",
+                                box( title = "Tornados By Hour", solidHeader = TRUE, status = "primary", width = 6,
+                                     plotOutput("stacked_bar_per_hour")
+                                )
+                             )
+                          )
+                  )
+               ) # End TabBox
+              #) # end column
+            )
             
-              fluidRow(
-                box(title = "Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
-                    radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
-                                 choiceNames = list(
-                                   "Numaric Values",
-                                   "Percentages"
-                                 ),
-                                 choiceValues = list(
-                                   "numb", "perc"
-                                 )),
-                    dataTableOutput("table_per_hour")),
-                
-                box( title = "Tornados By Hour", solidHeader = TRUE, status = "primary", width = 6,
-                     plotOutput("stacked_bar_per_hour")
-                )
-              )
       ),
       tabItem("injuries_fatalities_losses",
               fluidRow(
                 box(title = "Injuries, fatalities and loss for each year",
                     solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_year")
-                    
                 ),
                 box(title = "Injuries, fatalities and loss for each year",
                     solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_year_line")
-                    
                 )
-                
-      
                ),
               fluidRow(
-
                 box(title = "Injuries, fatalities and loss for each month",
                     solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_month")
-                    
                 ),
                 box(title = "Injuries, fatalities and loss for each month",
                     solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_month_line")
-                    
                 )
-                
-                
               ),
               fluidRow(
-              
-    
                 box(title = "Injuries, fatalities and loss for each hour",
                     solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour")
-                    
                 ),
                 box(title = "Injuries, fatalities and loss for each hour",
                     solidHeader = TRUE, status = "primary",width = 6,plotOutput("inj_fat_loss_hour_line")
-                    
                 )
-                
-                
-                
               ),
               fluidRow(
                 box(title = "Most Hit Counties",
@@ -232,7 +247,24 @@ ui <- dashboardPage(
                 box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 6,
                     leafletOutput("topDestructive")
                 )
-              ) # end of fluid row
+              ), # end of fluid row
+              fluidRow(
+                box(title = "Tornadoes by distance", solidHeader = TRUE, status = "primary",width = 6,
+                    radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
+                                 choiceNames = list(
+                                   "Numaric Values",
+                                   "Percentages"
+                                 ),
+                                 choiceValues = list(
+                                   "numb", "perc"
+                                 )),
+                    dataTableOutput("table_per_dist")),
+                
+                
+                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 6,
+                     plotOutput("stacked_bar_per_dist")
+                )
+              ) 
       )
                 
              
@@ -248,7 +280,7 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
   
-  
+  comp_state <- "TX"
   
   sliderValues <- reactive({
     
@@ -309,186 +341,226 @@ server <- function(input, output) {
     map
   }
   
-  output$table_per_year<- DT::renderDataTable(
-    DT::datatable({
-      temp <- allData %>% filter(st == "IL")
-      temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
-      temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
-      "fill 0's in to dataset"
-      temp2[is.na(temp2)] <- 0
-      "get data into correct form"
-      temp3 <- cast(temp2, yr ~ mag, mean, value = "count")
-      
-      "calculate totals"
-      temp3$year_total <-  rowSums(temp3[2:8])
-      
-      "calculate percent for each year"
-      
-      temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$year_total)
-      temp3$'0 Percent' <- percent(temp3$`0`/temp3$year_total)
-      temp3$'1 Percent' <- percent(temp3$`1`/temp3$year_total)
-      temp3$'2 Percent' <- percent(temp3$`2`/temp3$year_total)
-      temp3$'3 Percent' <- percent(temp3$`3`/temp3$year_total)
-      temp3$'4 Percent' <- percent(temp3$`4`/temp3$year_total)
-      temp3$'5 Percent' <- percent(temp3$`5`/temp3$year_total)
-      
-      "move the total to last col"
-      temp3 <- temp3%>%select(-year_total,year_total)
-      
-      "Remove Col user does not want to see"
-      if(input$table_by_year_view == "numb")
-      {
-        finalChart <- temp3[-c(9:15)]
-      }
-      else
-      {
-        finalChart <- temp3[-c(2:8)]
-      }
-      
-      finalChart
-    },
-    options = list(pageLength = 12))
-  )
   
-  output$stacked_bar_per_year<- renderPlot({
-    temp <- allData %>% filter(st == "IL")
-      temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
-      temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
-      "fill 0's in to dataset"
-      temp2[is.na(temp2)] <- 0
-
-      
-      ggplot(data=temp2, aes(x=yr, y=count, fill=mag)) +
-        geom_bar(stat="identity") + scale_x_continuous(breaks=seq(1950,2016,5)) +
-        scale_fill_brewer(palette = "Set1")
-      
-      
-    }
-  )
+  table_per_year_func <- function (state_abbrev){
+    return (
+      DT::renderDataTable(
+        DT::datatable({
+          temp <- allData %>% filter(st == state_abbrev)
+          temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
+          temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
+          "fill 0's in to dataset"
+          temp2[is.na(temp2)] <- 0
+          "get data into correct form"
+          temp3 <- cast(temp2, yr ~ mag, mean, value = "count")
+          
+          "calculate totals"
+          temp3$year_total <-  rowSums(temp3[2:8])
+          
+          "calculate percent for each year"
+          
+          temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$year_total)
+          temp3$'0 Percent' <- percent(temp3$`0`/temp3$year_total)
+          temp3$'1 Percent' <- percent(temp3$`1`/temp3$year_total)
+          temp3$'2 Percent' <- percent(temp3$`2`/temp3$year_total)
+          temp3$'3 Percent' <- percent(temp3$`3`/temp3$year_total)
+          temp3$'4 Percent' <- percent(temp3$`4`/temp3$year_total)
+          temp3$'5 Percent' <- percent(temp3$`5`/temp3$year_total)
+          
+          "move the total to last col"
+          temp3 <- temp3%>%select(-year_total,year_total)
+          
+          "Remove Col user does not want to see"
+          if(input$table_by_year_view == "numb")
+          {
+            finalChart <- temp3[-c(9:15)]
+          }
+          else
+          {
+            finalChart <- temp3[-c(2:8)]
+          }
+          
+          finalChart
+        },
+        options = list(pageLength = 24))
+      )
+     )
+  }
   
-  output$table_per_month<- DT::renderDataTable(
-    DT::datatable({
-      temp <- allData %>% filter(st == "IL")
+  output$table_per_year<- table_per_year_func("IL")
+  output$table_per_year_comp_state<- table_per_year_func("TX")
+  
+  stacked_bar_per_year_func <- function(state_abbrev) {
+    return ( 
+      renderPlot({
+        temp <- allData %>% filter(st == state_abbrev)
+        temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
+        temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
+        "fill 0's in to dataset"
+        temp2[is.na(temp2)] <- 0
+        
+        ggplot(data=temp2, aes(x=yr, y=count, fill=mag)) +
+          geom_bar(stat="identity") + scale_x_continuous(breaks=seq(1950,2016,5)) +
+          scale_fill_brewer(palette = "Set1")
+      })
+    )
+  }
+  
+  output$stacked_bar_per_year<- stacked_bar_per_year_func("IL")
+  output$stacked_bar_per_year_comp_state<- stacked_bar_per_year_func("TX")
+  
+  table_per_month_func <- function(state_abbrev){
+    return (
+      DT::renderDataTable(
+      DT::datatable({
+        temp <- allData %>% filter(st == state_abbrev)
+        temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
+        temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
+        "fill 0's in to dataset"
+        temp2[is.na(temp2)] <- 0
+        "get data into correct form"
+        temp3 <- cast(temp2, month_abb ~ mag, mean, value = "count")
+        
+        "calculate totals"
+        temp3$month_total <-  rowSums(temp3[2:8])
+        
+        "calculate percent for each month"
+        temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$month_total)
+        temp3$'0 Percent' <- percent(temp3$`0`/temp3$month_total)
+        temp3$'1 Percent' <- percent(temp3$`1`/temp3$month_total)
+        temp3$'2 Percent' <- percent(temp3$`2`/temp3$month_total)
+        temp3$'3 Percent' <- percent(temp3$`3`/temp3$month_total)
+        temp3$'4 Percent' <- percent(temp3$`4`/temp3$month_total)
+        temp3$'5 Percent' <- percent(temp3$`5`/temp3$month_total)
+        
+        "move the total to last col"
+        temp3 <- temp3%>%select(-month_total,month_total)
+        
+        "Remove Col user does not want to see"
+        if(input$table_by_month_view == "numb")
+        {
+          finalChart <- temp3[-c(9:15)]
+        }
+        else
+        {
+          finalChart <- temp3[-c(2:8)]
+        }
+        
+        finalChart
+      },
+      options = list(pageLength = 12))
+      )
+    )
+  }
+  
+  output$table_per_month<- table_per_month_func("IL")
+  output$table_per_month_comp_state<- table_per_month_func("TX")
+  
+  stacked_bar_per_month_func <- function(state_abbrev){
+    return (
+      renderPlot({
+      temp <- allData %>% filter(st == state_abbrev)
       temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
       "fill 0's in to dataset"
       temp2[is.na(temp2)] <- 0
-      "get data into correct form"
-      temp3 <- cast(temp2, month_abb ~ mag, mean, value = "count")
       
-      "calculate totals"
-      temp3$month_total <-  rowSums(temp3[2:8])
-      
-      "calculate percent for each month"
-      
-      temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$month_total)
-      temp3$'0 Percent' <- percent(temp3$`0`/temp3$month_total)
-      temp3$'1 Percent' <- percent(temp3$`1`/temp3$month_total)
-      temp3$'2 Percent' <- percent(temp3$`2`/temp3$month_total)
-      temp3$'3 Percent' <- percent(temp3$`3`/temp3$month_total)
-      temp3$'4 Percent' <- percent(temp3$`4`/temp3$month_total)
-      temp3$'5 Percent' <- percent(temp3$`5`/temp3$month_total)
-      
-      "move the total to last col"
-      temp3 <- temp3%>%select(-month_total,month_total)
-      
-      "Remove Col user does not want to see"
-      if(input$table_by_month_view == "numb")
-      {
-        finalChart <- temp3[-c(9:15)]
-      }
-      else
-      {
-        finalChart <- temp3[-c(2:8)]
-      }
-      
-      finalChart
-    },
-    options = list(pageLength = 12))
-  )
-  
-  output$stacked_bar_per_month<- renderPlot({
-    temp <- allData %>% filter(st == "IL")
-    temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
-    temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
-    "fill 0's in to dataset"
-    temp2[is.na(temp2)] <- 0
-    
-    
-    ggplot(data=temp2, aes(x=month_abb, y=count, fill=mag)) +
-      geom_bar(stat="identity") + 
-      scale_fill_brewer(palette = "Set1")
-    
+      ggplot(data=temp2, aes(x=month_abb, y=count, fill=mag)) +
+        geom_bar(stat="identity") + 
+        scale_fill_brewer(palette = "Set1")
+      })
+    )
   }
-  )
   
-  output$table_per_hour<- DT::renderDataTable(
-    DT::datatable({
-      temp <- allData %>% filter(st == "IL")
-      temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
-      temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
-      "fill 0's in to dataset"
-      temp2[is.na(temp2)] <- 0
-      "get data into correct form"
-      temp3 <- cast(temp2, hour ~ mag, mean, value = "count")
-      
-      "calculate totals"
-      temp3$hour_total <-  rowSums(temp3[2:8])
-      
-      temp3$hour<-switch_hour(temp3$hour)
-      #set a factor for time baised on what clock we are in
-      temp3$hour <- set_time_factor(temp3$hour)
-      
-      "calculate percent for each hour"
-      
-      temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$hour_total)
-      temp3$'0 Percent' <- percent(temp3$`0`/temp3$hour_total)
-      temp3$'1 Percent' <- percent(temp3$`1`/temp3$hour_total)
-      temp3$'2 Percent' <- percent(temp3$`2`/temp3$hour_total)
-      temp3$'3 Percent' <- percent(temp3$`3`/temp3$hour_total)
-      temp3$'4 Percent' <- percent(temp3$`4`/temp3$hour_total)
-      temp3$'5 Percent' <- percent(temp3$`5`/temp3$hour_total)
-      
-      "move the total to last col"
-      temp3 <- temp3%>%select(-hour_total,hour_total)
-      
-      "Remove Col user does not want to see"
-      if(input$table_by_hour_view == "numb")
-      {
-        finalChart <- temp3[-c(9:15)]
-      }
-      else
-      {
-        finalChart <- temp3[-c(2:8)]
-      }
-      
-      finalChart
-    },
-    options = list(pageLength = 12))
-  )
+  output$stacked_bar_per_month<- stacked_bar_per_month_func("IL")
+  output$stacked_bar_per_month_comp_state<- stacked_bar_per_month_func("TX")
   
+  # template
+  # _func <- function(state_abbrev){
+  #   return (
+  #   )
+  # }
   
-  
-  output$stacked_bar_per_hour<- renderPlot({
-    temp <- allData %>% filter(st == "IL")
-    temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
-    temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
-    "fill 0's in to dataset"
-    temp2[is.na(temp2)] <- 0
-    
-    temp2$hour<-switch_hour(temp2$hour)
-    #set a factor for time baised on what clock we are in
-    temp2$hour <- set_time_factor(temp2$hour)
-    
-    
-    ggplot(data=temp2, aes(x=hour, y=count, fill=mag)) +
-      geom_bar(stat="identity") + 
-      scale_fill_brewer(palette = "Set1") +
-      theme(axis.text.x = element_text(angle = 15, hjust = 1))
-    
+  table_per_hour_func <- function(state_abbrev){
+    return (
+      DT::renderDataTable(
+        DT::datatable({
+          temp <- allData %>% filter(st == comp_state)
+          temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+          temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
+          "fill 0's in to dataset"
+          temp2[is.na(temp2)] <- 0
+          "get data into correct form"
+          temp3 <- cast(temp2, hour ~ mag, mean, value = "count")
+          
+          "calculate totals"
+          temp3$hour_total <-  rowSums(temp3[2:8])
+          
+          temp3$hour<-switch_hour(temp3$hour)
+          #set a factor for time baised on what clock we are in
+          temp3$hour <- set_time_factor(temp3$hour)
+          
+          "calculate percent for each hour"
+          
+          temp3$'-9 Percent' <- percent(temp3$`-9`/temp3$hour_total)
+          temp3$'0 Percent' <- percent(temp3$`0`/temp3$hour_total)
+          temp3$'1 Percent' <- percent(temp3$`1`/temp3$hour_total)
+          temp3$'2 Percent' <- percent(temp3$`2`/temp3$hour_total)
+          temp3$'3 Percent' <- percent(temp3$`3`/temp3$hour_total)
+          temp3$'4 Percent' <- percent(temp3$`4`/temp3$hour_total)
+          temp3$'5 Percent' <- percent(temp3$`5`/temp3$hour_total)
+          
+          "move the total to last col"
+          temp3 <- temp3%>%select(-hour_total,hour_total)
+          
+          "Remove Col user does not want to see"
+          if(input$table_by_hour_view == "numb")
+          {
+            finalChart <- temp3[-c(9:15)]
+          }
+          else
+          {
+            finalChart <- temp3[-c(2:8)]
+          }
+          
+          finalChart
+        },
+        options = list(pageLength = 24))
+      )
+   )
   }
-  )
   
+  output$table_per_hour<- table_per_hour_func("IL")
+  output$table_per_hour_comp_state<- table_per_hour_func("TX")
+  
+  stacked_bar_per_hour_func <- function(state_abbrev){
+    return (
+      renderPlot({
+        temp <- allData %>% filter(st == state_abbrev)
+        temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
+        temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
+        "fill 0's in to dataset"
+        temp2[is.na(temp2)] <- 0
+        
+        temp2$hour<-switch_hour(temp2$hour)
+        #set a factor for time baised on what clock we are in
+        temp2$hour <- set_time_factor(temp2$hour)
+        
+        
+        ggplot(data=temp2, aes(x=hour, y=count, fill=mag)) +
+          geom_bar(stat="identity") + 
+          scale_fill_brewer(palette = "Set1") +
+          theme(axis.text.x = element_text(angle = 15, hjust = 1))
+     })
+    )
+  }
+  
+  output$stacked_bar_per_hour<- stacked_bar_per_hour_func("IL")
+  output$stacked_bar_per_hour_comp_state<- stacked_bar_per_hour_func("TX")
+  
+  ###
+ 
+  # Calculates Tornados By Distance to Chicago (doesn't make sense for comparison for states) 
   output$table_per_dist<- DT::renderDataTable(
     DT::datatable({
       
@@ -553,9 +625,10 @@ server <- function(input, output) {
       
       
     },
-    options = list(pageLength = 12))
+    options = list(pageLength = 24))
   )
   
+  # Calculates Tornados By Distance to Chicago (doesn't make sense for comparison for states) 
   output$stacked_bar_per_dist<- renderPlot({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     latlong <- temp[, c("slon","slat")]
@@ -594,6 +667,8 @@ server <- function(input, output) {
                        labels= label)
   }
   )
+  
+  ###
   
   #table and chart showing the injuries, fatalities, loss  all years
   output$inj_fat_loss_year <- DT::renderDataTable(
