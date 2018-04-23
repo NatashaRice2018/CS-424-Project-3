@@ -1102,7 +1102,10 @@ server <- function(input, output) {
     temp <- filtered %>% filter(elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     "filter by county if selected"
     if(input$county) {
-      temp <- temp %>%  filter(county == input$selCounty)
+      if(req(input$selCounty) != "Error:")
+      {
+        temp <- temp %>%  filter(county == input$selCounty)
+        }
       
     }
     if(nrow(temp) == 0)
