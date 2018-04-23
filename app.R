@@ -33,7 +33,7 @@ vars <- c(
 )
 
 mapView <- c(
-  "Plain" = "OpenStreetMap.DE",
+  "Plain" = "OpenStreetMap.Mapnik",
   "Plain (Black/White)" = "OpenStreetMap.BlackAndWhite",
   "Dark" = "CartoDB.DarkMatter",
   "Electricity" = "NASAGIBS.ViirsEarthAtNight2012",
@@ -455,7 +455,7 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     leaflet() %>%
       addTiles(
-        urlTemplate = "https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"
+        urlTemplate = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       ) %>%
       setView(lng = -93.85, lat = 37.45, zoom = 4)
   })
