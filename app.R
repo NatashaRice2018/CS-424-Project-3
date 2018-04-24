@@ -75,9 +75,8 @@ ui <- dashboardPage(
     width= 650,
     sidebarMenu(
       menuItem("About", tabName="about"),
-      menuItem("Number of Tornadoes", tabName="number_of_tornadoes"),
-      menuItem("Injuries, Fatalities, Losses", tabName="injuries_fatalities_losses"),
-      menuItem("Tornado Damage", tabName="tornado_damage"),
+      menuItem("Tornado Facts", tabName="number_of_tornadoes"),
+      menuItem("Illinois Tornado Facts", tabName="tornado_damage"),
       menuItem("Tornado Tracks", tabName="tornado_tracks"),
       menuItem("Time",
                box(
@@ -103,14 +102,17 @@ ui <- dashboardPage(
       ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
-                tabBox(width=3,height=2150, title="Tornado Facts",
+            column(width=3,
+                h2("Tornado Sightings: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
+                tabBox(width=12,height=2150,
                   tabPanel("Tornados By Year", 
                      tabBox(width=12,
                        tabPanel("Table",
                         box(title = "Illinois Tornados By Year", solidHeader = TRUE, status = "primary",width = 6,
-                            radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
+                            radioButtons("table_by_year_view", label=NA,inline = TRUE,
                                          choiceNames = list(
-                                           "Numaric Values",
+                                           "Numeric Values",
                                            "Percentages"
                                          ),
                                          choiceValues = list(
@@ -118,9 +120,9 @@ ui <- dashboardPage(
                                          )),
                             dataTableOutput("table_per_year")),
                         box(title = paste(comp_state_full," Tornados By Year"), solidHeader = TRUE, status = "primary",width = 6,
-                            radioButtons("table_by_year_view", "Choose one:",  inline = TRUE,
+                            radioButtons("table_by_year_view", label=NA,inline = TRUE,
                                          choiceNames = list(
-                                           "Numaric Values",
+                                           "Numeric Values",
                                            "Percentages"
                                          ),
                                          choiceValues = list(
@@ -220,22 +222,29 @@ ui <- dashboardPage(
                              ) #end tab panel
                           ) # End tab box
                   )
-               ), # End TabBox for Tornado Facts
-               # Start Tab Box for Illinois Tornado Paths
-               tabBox(width=3,
-                  box(title = "Illinois Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
-                      leafletOutput("leaf", height=1900)
-                  )
-               ),
-               # Start Tab Box for Texas Tornado Paths
-               tabBox(width=3,
-                  box(title = "Texas Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
-                      leafletOutput("leaf_comp_state", height=1900)
-                  )
-               ),
+               )
+              ) # End column
+               , # End TabBox for Tornado Facts
+            
+               # # Start Tab Box for Illinois Tornado Paths
+               # tabBox(width=3,
+               #    box(title = "Illinois Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
+               #        leafletOutput("leaf", height=1900)
+               #    )
+               # ),
+               # # Start Tab Box for Texas Tornado Paths
+               # tabBox(width=3,
+               #    box(title = "Texas Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
+               #        leafletOutput("leaf_comp_state", height=1900)
+               #    )
+               # ),
+            
                #Start TabBox for Injuries, Fatalities, Losses
-               tabBox(width=3,
-                 tabPanel("Injuries, Fatalities, Losses By Year", 
+            column(width=3,
+                h2("Tornado Injuries, Fatalities, and Losses: 1950-2017", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
+               tabBox(width=12,
+                 tabPanel("By Year", 
                     tabBox(width=12,
                       tabPanel("Table",
                         box(title = "Illinois Injuries, Fatalities and Losses for each year",
@@ -259,7 +268,7 @@ ui <- dashboardPage(
                       )
                     ) #end tab box
                  ), # end tab panel
-                 tabPanel("Injuries, Fatalities, Losses By Month", 
+                 tabPanel("By Month", 
                     tabBox(width=12,
                       tabPanel("Table",
                         box(title = "Illinois Injuries, fatalities and loss for each month",
@@ -283,7 +292,7 @@ ui <- dashboardPage(
                       )
                   ) # end tab box in tab panel
                  ), # end tab panel
-                 tabPanel("Injuries, Fatalities, Losses By Month", 
+                 tabPanel("By Hour", 
                     tabBox(width=12,
                       tabPanel("Table",
                         box(title = "Illinois Injuries, fatalities and loss for each hour",
@@ -308,65 +317,60 @@ ui <- dashboardPage(
                     ) # end tab box in tab panel
                  ) # end tab panel
                ) # end tab box in fluid row
+            ) # end column in fluid row
           ) #End FluidRow for main dashboard
             
       ),
-      tabItem("injuries_fatalities_losses",
-              fluidRow(
+      tabItem("tornado_damage",
+              column(width=4,
+                h2("Illinois Counties Most Hit By Tornados: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
                 box(title = "Most Hit Counties",
-                    solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("most_hit_counties")),
+                    solidHeader = TRUE, status = "primary",width = 12,dataTableOutput("most_hit_counties")),
                 box(title = "Most Hit Counties",
-                    solidHeader = TRUE, status = "primary",width = 6,plotOutput("most_hit_counties_bar")
+                    solidHeader = TRUE, status = "primary",width = 12,plotOutput("most_hit_counties_bar")
                     
                 )
-              )
-            ),
-      
-      tabItem("tornado_damage",
-              
-              fluidRow(
-                titlePanel("Destruction Parameters"),
-                
-                sidebarPanel(
-                  
-                  # Input: Simple integer interval ----
-                  sliderInput("integer", "Fatalities:",
-                              min = 0, max = 1000,
-                              value = 500),
-                  
-                  # Input: Decimal interval with step value ----
-                  sliderInput("decimal", "Injuries:",
-                              min = 0, max = 1,
-                              value = 0.5, step = 0.1),
-                  
-                  # Input: Specification of range within an interval ----
-                  sliderInput("range", "Duration of Tornado:",
-                              min = 1, max = 1000,
-                              value = c(200,500)),
-                  
-                  # Input: Custom currency format for with basic animation ----
-                  sliderInput("format", "Property Loss Cost:",
-                              min = 0, max = 10000,
-                              value = 0, step = 2500,
-                              pre = "$", sep = ",",
-                              animate = TRUE),
-                  
-                  # Input: Animation with custom interval (in ms) ----
-                  # to control speed, plus looping
-                  sliderInput("animation", "Looping Animation:",
-                              min = 1, max = 2000,
-                              value = 1, step = 10,
-                              animate =
-                                animationOptions(interval = 300, loop = TRUE))
-                  
-                ),   
-                  
-                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 6,
-                    leafletOutput("topDestructive")
+              ),
+              column(width=4,
+                h2("Most Destructive Tornados in Illinois: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
+              #   titlePanel("Destruction Parameters"),
+              #   sidebarPanel(
+              #     # Input: Simple integer interval ----
+              #     sliderInput("integer", "Fatalities:",
+              #                 min = 0, max = 1000,
+              #                 value = 500),
+              #     # Input: Decimal interval with step value ----
+              #     sliderInput("decimal", "Injuries:",
+              #                 min = 0, max = 1,
+              #                 value = 0.5, step = 0.1),
+              #     # Input: Specification of range within an interval ----
+              #     sliderInput("range", "Duration of Tornado:",
+              #                 min = 1, max = 1000,
+              #                 value = c(200,500)),
+              #     # Input: Custom currency format for with basic animation ----
+              #     sliderInput("format", "Property Loss Cost:",
+              #                 min = 0, max = 10000,
+              #                 value = 0, step = 2500,
+              #                 pre = "$", sep = ",",
+              #                 animate = TRUE),
+              #     # Input: Animation with custom interval (in ms) ----
+              #     # to control speed, plus looping
+              #     sliderInput("animation", "Looping Animation:",
+              #                 min = 1, max = 2000,
+              #                 value = 1, step = 10,
+              #                 animate =
+              #                   animationOptions(interval = 300, loop = TRUE))
+              #   ),
+                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12, height=1900,
+                    leafletOutput("topDestructive", height=1600)
                 )
-              ), # end of fluid row
-              fluidRow(
-                box(title = "Tornadoes by distance", solidHeader = TRUE, status = "primary",width = 6,
+              ), # end of column
+              column(width=4,
+                h2("Tornados by Distance From Chicago: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
+                box(title = "Tornadoes by Distance From Chicago", solidHeader = TRUE, status = "primary",width = 12,
                     radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
                                  choiceNames = list(
                                    "Numaric Values",
@@ -376,12 +380,10 @@ ui <- dashboardPage(
                                    "numb", "perc"
                                  )),
                     dataTableOutput("table_per_dist")),
-                
-                
-                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 6,
+                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 12,
                      plotOutput("stacked_bar_per_dist")
                 )
-              ) 
+              )
       ), # end tab item
       tabItem("tornado_tracks",
               div(class="outer",
@@ -398,9 +400,9 @@ ui <- dashboardPage(
                                 width = 330, height = "auto",
                                 
                                 h2("Tornado Views"),
-                                selectInput("map", "MAp Type", mapView, selected = "Plain"),
+                                selectInput("map", "Map Type", mapView, selected = "Plain"),
                                 selectInput("state", "State", unique(allData$st), selected = "IL"),
-                                checkboxInput("county", "View by Couny", value = F),
+                                checkboxInput("county", "View by County", value = F),
                                 conditionalPanel("input.county", uiOutput("countiesList")),
                                 selectInput("color", "Color", vars, selected = "mag"),
                                 selectInput("size", "Size", vars, selected = "wid"),
@@ -595,6 +597,8 @@ server <- function(input, output) {
           
           "move the total to last col"
           temp3 <- temp3%>%select(-year_total,year_total)
+          names(temp3)[names(temp3)=="yr"] <- "Year"
+          names(temp3)[names(temp3)=="year_total"] <- "Total"
           
           "Remove Col user does not want to see"
           if(input$table_by_year_view == "numb")
@@ -608,6 +612,7 @@ server <- function(input, output) {
           
           finalChart
         },
+        rownames = FALSE,
         options = list(pageLength = 24))
       )
      )
