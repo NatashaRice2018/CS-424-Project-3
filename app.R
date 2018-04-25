@@ -27,7 +27,7 @@ library(leaflet.extras)
 vars <- c(
   "Magnitude" = "mag",
   "Width" = "wid",
-  "Loss" = "loss",
+  "Loss" = "avg_loss",
   "Injuries" = "inj",
   "Fatalities" = "fat",
   "Length" = "len"
@@ -447,7 +447,7 @@ server <- function(input, output) {
   ## Interactive Map ###########################################
   filteredData <- reactive({ allData[ allData$wid >= input$width[1] & allData$wid <= input$width[2] &
                                         allData$len >= input$length[1] & allData$len <= input$length[2] &
-                                        allData$loss >= input$loss[1] & allData$loss <= input$loss[2] &
+                                        allData$avg_loss >= input$loss[1] & allData$avg_loss <= input$loss[2] &
                                         allData$fat >= input$fat[1] & allData$fat <= input$fat[2] &
                                         allData$inj >= input$injuries[1] & allData$inj <= input$injuries[2] &
                                         allData$yr >= input$year[1] & allData$yr <= input$year[2] &
@@ -487,8 +487,8 @@ server <- function(input, output) {
   
   output$loss <- renderUI({
     temp = stateData()
-    sliderInput("loss", "loss", min(temp$loss), max(temp$loss),
-                value = range(temp$loss), step = 1.0
+    sliderInput("loss", "loss", min(temp$avg_loss), max(temp$avg_loss),
+                value = range(temp$avg_loss), step = 1.0
     )
   })
   

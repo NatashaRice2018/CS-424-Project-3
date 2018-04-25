@@ -30,6 +30,10 @@ allData$loss_max <- allData$loss_min
 allData$loss_min[allData$yr<1996 & allData$loss>0]<-5*10^(allData$loss_min[allData$yr<1996 & allData$loss >0]-1)
 allData$loss_max[allData$yr<1996 & allData$loss>0]<-5*10^allData$loss_max[allData$yr<1996 & allData$loss >0]
 
+"get adverage of these two rows"
+allData$avg_loss <- (allData$loss_max + allData$loss_min) / 2
+
+
 
 "!!!!!If any other vairables are needed for the structure add the lines here and create a new version of the .rds file!!!!!"
 
