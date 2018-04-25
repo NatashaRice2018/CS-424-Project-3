@@ -410,6 +410,8 @@ ui <- dashboardPage(
                                 selectInput("state", "State", unique(allData$st), selected = "IL"),
                                 checkboxInput("county", "View by County", value = F),
                                 conditionalPanel("input.county", uiOutput("countiesList")),
+                                checkboxInput("state2", "View Second State", value = F),
+                                conditionalPanel("input.state2", selectInput("state2Selected", "State", unique(allData$st), selected = "TX")),
                                 selectInput("color", "Color", vars, selected = "mag"),
                                 selectInput("size", "Size", vars, selected = "wid"),
                                 #filter all data by stte here
@@ -452,6 +454,15 @@ server <- function(input, output) {
                                         allData$yr >= input$year[1] & allData$yr <= input$year[2] &
                                         allData$mag %in% input$magnitude &
                                         allData$st == input$state, ]})
+  
+  filteredDataTwoStates <- reactive({ allData[ allData$wid >= input$width[1] & allData$wid <= input$width[2] &
+                                        allData$len >= input$length[1] & allData$len <= input$length[2] &
+                                        allData$avg_loss >= input$loss[1] & allData$avg_loss <= input$loss[2] &
+                                        allData$fat >= input$fat[1] & allData$fat <= input$fat[2] &
+                                        allData$inj >= input$injuries[1] & allData$inj <= input$injuries[2] &
+                                        allData$yr >= input$year[1] & allData$yr <= input$year[2] &
+                                        allData$mag %in% input$magnitude &
+                                        allData$st %in% c(input$state, input$state2Selected), ]})
   
   output$countiesList <- renderUI({
     temp <- filteredData()
@@ -1106,7 +1117,14 @@ server <- function(input, output) {
     colorBy <- input$color
     sizeBy <- input$size
     
-    filtered = filteredData()
+    if(!input$state2)
+    {
+      filtered = filteredData()
+    }
+    else
+    {
+      filtered = filteredDataTwoStates()
+    }
     
     temp <- filtered %>% filter(elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     "filter by county if selected"
