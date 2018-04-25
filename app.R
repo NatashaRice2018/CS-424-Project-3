@@ -21,6 +21,7 @@ library(RColorBrewer)
 library(scales)
 library(lattice)
 library(sp)
+library(leaflet.extras)
 
 # Choices for drop-downs
 vars <- c(
@@ -78,6 +79,7 @@ ui <- dashboardPage(
       menuItem("Tornado Facts", tabName="number_of_tornadoes"),
       menuItem("Illinois Tornado Facts", tabName="tornado_damage"),
       menuItem("Tornado Tracks", tabName="tornado_tracks"),
+      menuItem("Grad", tabName="Grad_Part"),
       menuItem("Time",
                box(
                  selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
@@ -100,6 +102,11 @@ ui <- dashboardPage(
               h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu"),
               a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
+      tabItem("Grad_Part",
+              box(title = "Heat Map", solidHeader = TRUE, status = "primary", width = 12, height=925,
+                  leafletOutput("heat", height=850)
+              )
+              ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
             column(width=3,
@@ -1218,6 +1225,27 @@ server <- function(input, output) {
         options = layersControlOptions(collapsed = FALSE)
       )
     map3
+  })
+  
+  output$heat <- renderLeaflet({
+    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0,month.abb =='Oct')
+    map3 = leaflet(temp) %>% addTiles(group = "OSM (default)") %>% 
+      addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+      addProviderTiles(providers$Stamen.Terrain, group = "Terrain")  %>%
+      addProviderTiles(providers$Stamen.Watercolor, group = "Watercolor")
+    ## specifying different colour gradient
+   
+    
+    map3 = map3 %>% addHeatmap(lat = ~c(slat,elat), lng = ~c(slon,elon) , intensity = ~c(mag,mag), max = 6, radius = 6 ,blur = 10)
+    map3 = map3 %>% 
+      addLayersControl(
+        baseGroups = c("OSM (default)", "Toner", "Terrain", "Watercolor" ),
+      
+        options = layersControlOptions(collapsed = FALSE)
+      )
+    map3
+    
+    
   })
   
 } # end of server function
