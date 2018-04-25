@@ -38,11 +38,10 @@ mapView <- c(
   "Plain (Black/White)" = "OpenStreetMap.BlackAndWhite",
   "Dark" = "CartoDB.DarkMatter",
   "Electricity" = "NASAGIBS.ViirsEarthAtNight2012",
-  "Topoligical" = "OpenTopoMap",
+  "Topoligical" = "Stamen.Terrain",
   "Cities/Towns" = "Hydda.Full",
   "Realistic" = "Esri.WorldImagery",
-  "Rivers" = "Esri.OceanBasemap",
-  "Fun" = "Thunderforest.SpinalMap"
+  "Rivers" = "Esri.OceanBasemap"
 )
 
 allData <- readRDS("tornadoes.rds")
