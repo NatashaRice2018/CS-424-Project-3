@@ -1068,10 +1068,8 @@ server <- function(input, output) {
       label <- c("0 - 162", "162-250", "251 - 320", "321 - 400", "401 - 480", "481 - 580")
     }
     
-    temp <- group_by(temp, groups, mag) %>% summarise(count = n()) %>% group_by(mag)
-    temp2 <- temp %>% complete(groups, mag) %>% group_by(groups) %>% fill(mag)
-    "fill 0's in to dataset"
-    temp2[is.na(temp2)] <- 0
+    temp2 <- group_by(temp, groups, mag) %>% summarise(count = n()) %>% group_by(mag)
+
     
     ggplot(data=temp2, aes(x=groups, y=count, fill=mag)) +
       geom_bar(stat="identity") + 
