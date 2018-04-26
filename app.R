@@ -249,12 +249,12 @@ ui <- dashboardPage(
               ) # End column
                , # End TabBox for Tornado Facts
             
-               # # Start Tab Box for Illinois Tornado Paths
-               # tabBox(width=3,
-               #    box(title = "Illinois Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
-               #        leafletOutput("leaf", height=1900)
-               #    )
-               # ),
+################ Map for Illinois Tornado Paths Animation ##################
+               tabBox(width=3,
+                  box(title = "Illinois Tornado Paths Animation", solidHeader = TRUE, status = "primary", width = 12, height=2100,
+                      leafletOutput("leaf", height=1900)
+                  )
+                ),
                # # Start Tab Box for Texas Tornado Paths
                # tabBox(width=3,
                #    box(title = "Texas Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
