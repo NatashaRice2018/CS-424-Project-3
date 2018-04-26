@@ -102,6 +102,23 @@ ui <- dashboardPage(
               a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
       tabItem("Grad_Part",
+              sliderInput("opacity", "Opacity:",
+                          min = 0, max = 1,
+                          value = 0.6, step = 0.05),
+              sliderInput("radius", "Radius:",
+                          min = 0, max = 50,
+                          value = 16),
+              sliderInput("blur", "Blur:",
+                          min = 0, max = 30,
+                          value = 14, step = 2),
+              
+              box(title="Select Month",solidHeader = TRUE, status="primary",selectInput("mon_grad","Select Month",
+                                                                                        list(
+                                                                                          "Spring" = c("Mar","Apr","May"),
+                                                                                          "Summer" = c("Jun","Jul","Aug"),
+                                                                                          "Fall" = c("Sep","Oct","Nov"),
+                                                                                          "Winter" = c("Dec","Jan","Feb")
+                                                                                        ))),
               box(title = "Heat Map", solidHeader = TRUE, status = "primary", width = 12, height=925,
                   leafletOutput("heat", height=850)
               )
@@ -1248,8 +1265,10 @@ server <- function(input, output) {
  # )
   pal <- colorNumeric(c("white","lime green", "yellow","orange","red","purple"), 0:5)
   
+  filteredheatmonth <- reactive({allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0, month.abb == input$mon_grad)})
+  
   output$heat <- renderLeaflet({
-    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)
+    temp <- filteredheatmonth()
     temp$mag <- as.numeric(temp$mag)
     map3 = leaflet(temp) %>% addTiles(group = "OSM (default)") %>% 
       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
@@ -1258,7 +1277,7 @@ server <- function(input, output) {
     ## specifying different colour gradient
    
     k <- pal(c(temp$mag, temp$mag))
-    map3 = map3 %>% addHeatmap(lat = ~c(slat,elat), lng = ~c(slon,elon) , intensity = ~c(mag,mag), max = 6, radius = 6 ,blur = 10,gradient = k)
+    map3 = map3 %>% addHeatmap(lat = ~c(slat,elat), lng = ~c(slon,elon) , intensity = ~c(mag,mag),minOpacity= ~input$opacity, blur = ~input$blur, radius = ~input$radius,gradient = k)
     map3 = map3 %>% 
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Terrain", "Watercolor" ),
