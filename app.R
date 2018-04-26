@@ -1242,23 +1242,30 @@ server <- function(input, output) {
     map3
   })
   
+ # pal <- colorNumeric(
+  #  palette = "YlGnBu",
+  #  domain = as.numeric(allData$mag)
+ # )
+  pal <- colorNumeric(c("white","lime green", "yellow","orange","red","purple"), 0:5)
+  
   output$heat <- renderLeaflet({
-    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0,month.abb =='Oct')
+    temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)
+    temp$mag <- as.numeric(temp$mag)
     map3 = leaflet(temp) %>% addTiles(group = "OSM (default)") %>% 
       addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
       addProviderTiles(providers$Stamen.Terrain, group = "Terrain")  %>%
       addProviderTiles(providers$Stamen.Watercolor, group = "Watercolor")
     ## specifying different colour gradient
    
-    
-    map3 = map3 %>% addHeatmap(lat = ~c(slat,elat), lng = ~c(slon,elon) , intensity = ~c(mag,mag), max = 6, radius = 6 ,blur = 10)
+    k <- pal(c(temp$mag, temp$mag))
+    map3 = map3 %>% addHeatmap(lat = ~c(slat,elat), lng = ~c(slon,elon) , intensity = ~c(mag,mag), max = 6, radius = 6 ,blur = 10,gradient = k)
     map3 = map3 %>% 
       addLayersControl(
         baseGroups = c("OSM (default)", "Toner", "Terrain", "Watercolor" ),
       
         options = layersControlOptions(collapsed = FALSE)
       )
-    map3
+    map3 %>% addLegend("bottomleft",pal = pal, values = 0:5)
     
     
   })
