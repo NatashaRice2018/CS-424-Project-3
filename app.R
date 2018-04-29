@@ -1372,6 +1372,8 @@ server <- function(input, output) {
   output$topDestructive <- renderLeaflet({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     
+    temp <- head(temp[order(temp$our_top, decreasing = T),], n = 10)
+    
     "All options for map views"
     "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
 

@@ -33,7 +33,8 @@ allData$loss_max[allData$yr<1996 & allData$loss>0]<-5*10^allData$loss_max[allDat
 "get adverage of these two rows"
 allData$avg_loss <- (allData$loss_max + allData$loss_min) / 2
 
-
+"Scale the values we want to use for the top 10 destructive"
+allData$our_top <- (allData$avg_loss * .25) + (allData$fat * .50) + (allData$inj * .25) + as.numeric(allData$mag) * .25
 
 "!!!!!If any other vairables are needed for the structure add the lines here and create a new version of the .rds file!!!!!"
 
