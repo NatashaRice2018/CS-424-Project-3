@@ -145,7 +145,7 @@ ui <- dashboardPage(
               ),
               numericInput("max","Set value for year to start:", value = 1998),
               uiOutput("slider"),
-              leafletOutput("animate")
+              leafletOutput("animate",height = 850)
               ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
@@ -1435,7 +1435,7 @@ server <- function(input, output) {
   })
   
   output$slider <- renderUI({
-    sliderInput("slider2","Dynamic animation", max= 2016, min=1901, value=input$max, step=1,
+    sliderInput("slider2","Dynamic animation", max= max(allData$yr), min=min(allData$yr), value=input$max, step=1,
                 animate=animationOptions(800))
   })
   
@@ -1447,7 +1447,7 @@ server <- function(input, output) {
     "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
     
     leaflet() %>% addTiles(group = "OSM (default)") %>% 
-      setView(lng = -93.85, lat = 37.45, zoom = 4)
+      setView(lng = -93.85, lat = 37.45, zoom = 6)
   })
   
   observeEvent(input$slider2,{
