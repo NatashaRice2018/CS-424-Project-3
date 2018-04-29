@@ -11,6 +11,7 @@ allData$hour <-lubridate::hour(allData$date_time)
 allData$month_abb <- month.abb[allData$mo]
 allData$month_abb <- factor(allData$month_abb, levels = month.abb)
 allData$date <- date(allData$date_time)
+allData$time <- time[allData$time]
 "allData$time_12hr <- format(strptime(allData$time, format='%H:%M:%S'), '%I:%M:%S %p')
 allData$time_24hr <- allData$time"
 "Want to factor magnitude so we get null values if applicapable"

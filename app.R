@@ -64,6 +64,7 @@ t<-c("24 hour","12 hour am/pm")
                  #)
 
 comp_state_full <- "Texas"
+comp_state_fullish <-"Illinois"
 
 ui <- dashboardPage(
   dashboardHeader
@@ -323,7 +324,22 @@ ui <- dashboardPage(
                     ) # end tab box in tab panel
                  ) # end tab panel
                ) # end tab box in fluid row
-            ) # end column in fluid row
+            ), # end column in fluid row
+            
+            #Start TabBox for Injuries, Fatalities, Losses
+            column(width=3,
+                   h2("Top 10 Destructive Tornados", style="text-align:center; font-size:40px; background-color: black; color: white;
+                      padding-top:10px; padding-bottom:10px"),
+                   
+                   
+                  # box(title = "Most Destructive Tornados by Fatalities, Injuries, and Cost",
+                    #   solidHeader = TRUE, status = "primary",width = 12,dataTableOutput("destructive_tornados_func")),
+                   
+                   box(title = paste(comp_state_fullish, "Most Destructive Tornados by Fatalities, Injuries, and Cost"),
+                       solidHeader = TRUE, status = "primary",width = 12,dataTableOutput("destructive_tornados_comp_state")
+                   )
+          
+                   ) # end column in fluid row
           ) #End FluidRow for main dashboard
             
       ),
@@ -444,6 +460,22 @@ server <- function(input, output) {
   output$state <- renderPrint({
     input$state
   })
+  
+  day_DestructiveTornado <- reactive({
+    switch(input$day_DestructiveTornado,
+           "Tornado1" = "4/21/67",
+           "Tornado2" = "8/28/90",
+           "Tornado3" = "4/21/67",
+           "Tornado4" = "12/18/57", 
+           "Tornado5" = "5/29/82", 
+           "Tornado6" = "2/29/12", 
+           "Tornado7" = "11/17/13", 
+           "Tornado8" = "11/17/13", 
+           "Tornado9" = "4/9/53", 
+           "Tornado10" = "4/20/04"
+    )
+  })
+  
   
   ## Interactive Map ###########################################
   filteredData <- reactive({ allData[ allData$wid >= input$width[1] & allData$wid <= input$width[2] &
@@ -1102,6 +1134,79 @@ server <- function(input, output) {
     options = list(pageLength = 12)
     )
   )
+  
+  ## Table and chart showing which counties in Illinois were most hit by tornadoes summed over all years
+  output$most_destructive_tornados <- DT::renderDataTable(
+    DT::datatable({
+      #tornadoDay = c("Tornado1","Tornado2", "Tornado3","Tornado4", "Tornado5","Tornado6", "Tornado7","Tornado8", "Tornado9","Tornado10")
+     # date = c("4/21/67", "8/28/90", "4/21/67", "12/18/57", "5/29/82", "2/29/12", "11/17/13", "11/17/13", "4/9/53", "4/20/04")
+      Data2 <- subset(allData2, (fat == input$day_destructive | inj == input$day_destructive | loss == input$day_destructive) )
+      fatal_data <- Data2[Data2$DateOfDay %in% date, ]
+      injuries_data <- Data2[Data2$DateOfDay %in% date, ]
+      
+      dep_hour <- group_by(fatal_data,DateOfDay)  %>% select(fat) %>% filter(fat == input$day_destrutive ) %>% summarise(dep=n()) %>% arrange(DayOfDestruction)
+      
+      #dep_hour$type = "Departure"
+      
+      injuries_hour <- group_by(arr_data,DateOfDay)  %>% select(inj) %>% filter(inj==input$day_destructive) %>% summarise(arr=n())
+      #arr_hour$type = "Arrival"
+      delay_arr <- group_by(fatal_data,FL_DATE) %>% select(fat,ORIGIN,ARR_DELAY,DEP_DELAY) %>% filter(ARR_DELAY<0 & DEST==input$day_airport ) %>% summarise(arrival_delays=n())
+      delay_dep <- group_by(injuries_data,FL_DATE)  %>% select(inj,ORIGIN,ARR_DELAY,DEP_DELAY) %>% filter(DEP_DELAY <0 & ORIGIN==input$day_airport) %>% summarise(departure_delays=n())
+      
+      
+      data2 <- merge(dep_hour,arr_hour,all=TRUE)
+      data1 <- merge(delay_arr,delay_dep,all=TRUE)
+      c <- merge(data2,data1,all=TRUE)
+      
+      c$Day_of_Destruction <- tornadoDay
+      
+      
+      #set a factor for time baised on what clock we are in
+      #data2$hour <- set_time_factor(data2$hour)
+      c <- as.data.frame(c)
+      c
+
+      
+    }))
+  
+  destructive_tornados_func <- function(state_abbrev){
+    return (
+      DT::renderDataTable(
+        DT::datatable({
+         # tornadoDay = c("Tornado1","Tornado2", "Tornado3","Tornado4", "Tornado5","Tornado6", "Tornado7","Tornado8", "Tornado9","Tornado10")
+         # date = c("4/21/67", "8/28/90", "4/21/67", "12/18/57", "5/29/82", "2/29/12", "11/17/13", "11/17/13", "4/9/53", "4/20/04")
+          date = c("1967-04-21", "1990-08-28", "1967-04-21", "1957-12-18", "1982-05-29", "2012-02-29", "2013-11-17", "2013-11-17", "1953-04-09", "2004-04-20")
+          
+          temp <- allData %>% filter(st == state_abbrev)
+          
+          #attach(mtcars)
+          #allData <- mtcars[order(c)]
+          #detach(mtcars)
+          #n_time_year <- aggregate(c ~ date, data = temp, sum)
+          
+          n_inj_year <- aggregate(inj ~ date, data = temp, sum)
+          n_fat_year <- aggregate(fat ~ date, data = temp, sum)
+          #n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
+          n_loss_year_max <- aggregate(loss_max ~ date, data = temp, sum)
+          
+          inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
+         # inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_min)
+          inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_max)
+          #inj_fat_loss_year <- merge(inj_fat_loss_year, n_time_year)
+       
+          
+          inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
+          inj_fat_loss_year
+        },
+        options = list(pageLength = 10)
+        )
+      )
+    )
+  }
+  output$destructive_tornados <- destructive_tornados_func("IL") 
+  output$destructive_tornados_comp_state <- destructive_tornados_func(comp_state_abbrev) 
+  
+  
   
   output$most_hit_counties_bar <- renderPlot(
     {
