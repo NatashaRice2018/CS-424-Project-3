@@ -144,7 +144,8 @@ ui <- dashboardPage(
                   leafletOutput("heat", height=850)
               ),
               numericInput("max","Set value for year to start:", value = 1998),
-              uiOutput("slider")
+              uiOutput("slider"),
+              leafletOutput("animate")
               ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
@@ -1437,6 +1438,30 @@ server <- function(input, output) {
     sliderInput("slider2","Dynamic animation", max= 2016, min=1901, value=input$max, step=1,
                 animate=animationOptions(800))
   })
+  
+  filtered <- reactive({allData %>% filter(st == "IL", yr == input$slider2,elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)})
+  output$animate <- renderLeaflet({
+    
+    
+    "All options for map views"
+    "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
+    
+    leaflet() %>% addTiles(group = "OSM (default)") %>% 
+      setView(lng = -93.85, lat = 37.45, zoom = 4)
+  })
+  
+  observeEvent(input$slider2,{
+    temp <- subset(filtered(),yr == input$slider2)
+    map3 <- leafletProxy("animate") %>% clearShapes()
+    
+    map3 = set_paths_by_mag(0, map3, temp)
+    map3 = set_paths_by_mag(1, map3, temp)
+    map3 = set_paths_by_mag(2, map3, temp)
+    map3 = set_paths_by_mag(3, map3, temp)
+    map3 = set_paths_by_mag(4, map3, temp)
+    map3 = set_paths_by_mag(5, map3, temp)
+  })
+  
   
 } # end of server function
 
