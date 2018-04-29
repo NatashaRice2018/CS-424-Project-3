@@ -20,7 +20,7 @@ fips <- read.table('FIPS code',sep = ',',  quote='')
 names(fips)[1]<-'st'
 names(fips)[3]<-'f1'
 names(fips)[4]<-'county'
-allData2 <- merge(allData,fips,by=c('st','f1'), all.x = T)
+allData <- merge(allData,fips,by=c('st','f1'), all.x = T)
 
 
 allData$loss_min <- allData$loss
