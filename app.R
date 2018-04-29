@@ -142,7 +142,9 @@ ui <- dashboardPage(
                                                                                         ))),
               box(title = "Heat Map", solidHeader = TRUE, status = "primary", width = 12, height=925,
                   leafletOutput("heat", height=850)
-              )
+              ),
+              numericInput("max","Set value for year to start:", value = 1998),
+              uiOutput("slider")
               ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
@@ -1429,6 +1431,11 @@ server <- function(input, output) {
     map3 %>% addLegend("bottomleft",pal = pal, values = 0:5)
     
     
+  })
+  
+  output$slider <- renderUI({
+    sliderInput("slider2","Dynamic animation", max= 2016, min=1901, value=input$max, step=1,
+                animate=animationOptions(800))
   })
   
 } # end of server function
