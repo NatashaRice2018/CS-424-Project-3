@@ -16,7 +16,7 @@ allData$time_24hr <- allData$time"
 "Want to factor magnitude so we get null values if applicapable"
 allData$mag <- factor(allData$mag, levels = c(-9, 0, 1, 2, 3, 4, 5))
 
-fips <- read.table('FIPS code',sep = ',')
+fips <- read.table('FIPS code',sep = ',',  quote='')
 names(fips)[1]<-'st'
 names(fips)[3]<-'f1'
 names(fips)[4]<-'county'
