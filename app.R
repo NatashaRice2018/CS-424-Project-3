@@ -23,6 +23,31 @@ library(lattice)
 library(sp)
 library(leaflet.extras)
 
+# US States and Territories
+print("sample string")
+nameToAbb <-c("AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
+              "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY")
+names(nameToAbb) <-c("Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia",
+"Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
+"Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+"New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
+"Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+"West Virginia","Wisconsin","Wyoming")
+print(nameToAbb["Alabama"])
+
+abbToName <-c("Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia",
+"Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland",
+"Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire",
+"New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania",
+"Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+"West Virginia","Wisconsin","Wyoming")
+names(abbToName) <-c("AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
+              "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY")
+print(abbToName["AL"])
+
+testAbb <- "AL"
+print(abbToName[testAbb])
+
 # Choices for drop-downs
 vars <- c(
   "Magnitude" = "mag",
@@ -54,15 +79,6 @@ percent <- function(x, digits = 2, format = "f", ...) {
 t<-c("24 hour","12 hour am/pm")
 
 
-                  #tabPanel("Tornados By Hour",
-                           #tabBox(
-                             #tabPanel("Table",
-                             #),
-                             #tabPanel("Chart",
-                             #)
-                  #)
-                 #)
-
 comp_state_full <- "Texas"
 
 ui <- dashboardPage(
@@ -87,6 +103,11 @@ ui <- dashboardPage(
       menuItem("Unit",
                box(
                  selectInput("Unit","Miles or Kilometers", choices=c("Miles","Kilometers"), selected = 'Miles'), width=650
+               )
+      ),
+      menuItem("Comparison State",
+               box(
+                 selectInput("comparisonState", "State", nameToAbb, selected = "Texas"), width=650
                )
       )
     )
@@ -125,14 +146,14 @@ ui <- dashboardPage(
               ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
-            column(width=3,
+            column(width=4,
                 h2("Tornado Sightings: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
                 tabBox(width=12,height=2150,
                   tabPanel("Tornados By Year", 
                      tabBox(width=12,
                        tabPanel("Table",
-                        box(title = "Illinois Tornados By Year", solidHeader = TRUE, status = "primary",width = 6,
+                        box(title = "Illinois Tornadoes By Year", solidHeader = TRUE, status = "primary",width = 6,
                             radioButtons("table_by_year_view", label=NA,inline = TRUE,
                                          choiceNames = list(
                                            "Numeric Values",
@@ -142,7 +163,7 @@ ui <- dashboardPage(
                                            "numb", "perc"
                                          )),
                             dataTableOutput("table_per_year")),
-                        box(title = paste(comp_state_full," Tornados By Year"), solidHeader = TRUE, status = "primary",width = 6,
+                        box(title = textOutput("TornadoesByYear"), solidHeader = TRUE, status = "primary",width = 6,
                             radioButtons("table_by_year_view", label=NA,inline = TRUE,
                                          choiceNames = list(
                                            "Numeric Values",
@@ -155,12 +176,12 @@ ui <- dashboardPage(
                        ),
                        tabPanel("Chart",
                         fluidRow(
-                          box(title = "Illinois Tornados By Year", solidHeader = TRUE, status = "primary", width = 12, height=925,
+                          box(title = "Illinois Tornadoes By Year", solidHeader = TRUE, status = "primary", width = 12, height=925,
                                plotOutput("stacked_bar_per_year", height=850)
                           )
                         ),
                         fluidRow(
-                          box( title = paste(comp_state_full," Tornados By Year"), solidHeader = TRUE, status = "primary", width = 12, height=925,
+                          box(title = textOutput("TornadoesByYearChart"), solidHeader = TRUE, status = "primary", width = 12, height=925,
         
                                plotOutput("stacked_bar_per_year_comp_state", height=850)
                           )
@@ -172,7 +193,7 @@ ui <- dashboardPage(
                      tabBox(width=12,
                        tabPanel("Table",
                         box(title = "Illinois Tornadoes by Month", solidHeader = TRUE, status = "primary",width = 6,
-                            radioButtons("table_by_month_view", "Choose one:",  inline = TRUE,
+                            radioButtons("table_by_month_view", label=NA,  inline = TRUE,
                                          choiceNames = list(
                                            "Numaric Values",
                                            "Percentages"
@@ -181,8 +202,8 @@ ui <- dashboardPage(
                                            "numb", "perc"
                                          )),
                             dataTableOutput("table_per_month")),
-                        box(title = paste(comp_state_full, " Tornados by Month"), solidHeader = TRUE, status = "primary",width = 6,
-                            radioButtons("table_by_month_view", "Choose one:",  inline = TRUE,
+                        box(title = textOutput("TornadoesByMonth"), solidHeader = TRUE, status = "primary",width = 6,
+                            radioButtons("table_by_month_view", label=NA,  inline = TRUE,
                                          choiceNames = list(
                                            "Numaric Values",
                                            "Percentages"
@@ -194,12 +215,12 @@ ui <- dashboardPage(
                        ),
                        tabPanel("Chart",
                           fluidRow(
-                            box( title = "Illinois Tornados By Month", solidHeader = TRUE, status = "primary", width = 12,
+                            box( title = "Illinois Tornadoes By Month", solidHeader = TRUE, status = "primary", width = 12,
                                  plotOutput("stacked_bar_per_month")
                             )
                           ),
                           fluidRow(
-                            box( title = paste(comp_state_full, " Tornados By Month"), solidHeader = TRUE, status = "primary", width = 12,
+                            box(title = textOutput("TornadoesByMonthChart"), solidHeader = TRUE, status = "primary", width = 12,
                                  plotOutput("stacked_bar_per_month_comp_state")
                             )
                           )
@@ -210,8 +231,8 @@ ui <- dashboardPage(
                   tabPanel("Tornados By Hour",
                            tabBox(width=12,
                              tabPanel("Table",
-                                box(title = "Illinois Tornadoes by hour", solidHeader = TRUE, status = "primary",width = 6,
-                                    radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
+                                box(title = "Illinois Tornadoes by Hour", solidHeader = TRUE, status = "primary",width = 6,
+                                    radioButtons("table_by_hour_view", label=NA,  inline = TRUE,
                                                  choiceNames = list(
                                                    "Numaric Values",
                                                    "Percentages"
@@ -220,8 +241,8 @@ ui <- dashboardPage(
                                                    "numb", "perc"
                                                  )),
                                     dataTableOutput("table_per_hour")),
-                                box(title = paste(comp_state_full, " Tornadoes by hour"), solidHeader = TRUE, status = "primary",width = 6,
-                                    radioButtons("table_by_hour_view", "Choose one:",  inline = TRUE,
+                                box(title = textOutput("TornadoesByHour"), solidHeader = TRUE, status = "primary",width = 6,
+                                    radioButtons("table_by_hour_view", label=NA,  inline = TRUE,
                                                  choiceNames = list(
                                                    "Numaric Values",
                                                    "Percentages"
@@ -233,12 +254,12 @@ ui <- dashboardPage(
                              ),
                              tabPanel("Chart",
                                 fluidRow(
-                                  box( title = "Illinois Tornados By Hour", solidHeader = TRUE, status = "primary", width = 12,
+                                  box( title = "Illinois Tornadoes By Hour", solidHeader = TRUE, status = "primary", width = 12,
                                        plotOutput("stacked_bar_per_hour")
                                   )
                                 ),
                                 fluidRow(
-                                  box( title = paste(comp_state_full, " TX Tornados By Hour"), solidHeader = TRUE, status = "primary", width = 12,
+                                  box( title = textOutput("TornadoesByHourChart"), solidHeader = TRUE, status = "primary", width = 12,
                                        plotOutput("stacked_bar_per_hour_comp_state")
                                   )
                                 )
@@ -250,11 +271,11 @@ ui <- dashboardPage(
                , # End TabBox for Tornado Facts
             
 ################ Map for Illinois Tornado Paths Animation ##################
-               tabBox(width=3,
-                  box(title = "Illinois Tornado Paths Animation", solidHeader = TRUE, status = "primary", width = 12, height=2100,
-                      leafletOutput("leaf", height=1900)
-                  )
-                ),
+               #tabBox(width=3,
+               #   box(title = "Illinois Tornado Paths Animation", solidHeader = TRUE, status = "primary", width = 12, height=2100,
+               #       leafletOutput("leaf", height=1900)
+               #   )
+               # ),
                # # Start Tab Box for Texas Tornado Paths
                # tabBox(width=3,
                #    box(title = "Texas Tornado Paths", solidHeader = TRUE, status = "primary", width = 12, height=2100,
@@ -263,28 +284,29 @@ ui <- dashboardPage(
                # ),
             
                #Start TabBox for Injuries, Fatalities, Losses
-            column(width=3,
+            column(width=4,
                 h2("Tornado Injuries, Fatalities, and Losses: 1950-2017", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
                tabBox(width=12,
                  tabPanel("By Year", 
                     tabBox(width=12,
                       tabPanel("Table",
-                        box(title = "Illinois Injuries, Fatalities and Losses for each year",
-                            solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_year")
+                        box(title = "Illinois Statistics By Year",
+                            solidHeader = TRUE, status = "primary",width = 6,
+                            dataTableOutput("inj_fat_loss_year")
                         ),
-                        box(title = paste(comp_state_full, " Injuries, fatalities and loss for each year"),
+                        box(title = textOutput("InjFatLossByYear"),
                             solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_year_comp_state")
                         )
                       ),
                       tabPanel("Chart",
                         fluidRow(
-                          box(title = "Illinois Injuries, fatalities and losses for each year",
+                          box(title = "Illinois Statistics By Year",
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_year_line")
                           )
                         ),
                         fluidRow(
-                          box(title = paste(comp_state_full, " Injuries, fatalities and losses for each year"),
+                          box(title = textOutput("InjFatLossByYearChart"),
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_year_line_comp_state")
                           )
                         )
@@ -294,21 +316,21 @@ ui <- dashboardPage(
                  tabPanel("By Month", 
                     tabBox(width=12,
                       tabPanel("Table",
-                        box(title = "Illinois Injuries, fatalities and loss for each month",
+                        box(title = "Illinois Statistics By Month",
                             solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_month")
                         ),
-                        box(title = paste(comp_state_full, " Injuries, fatalities and loss for each month"),
+                        box(title = textOutput("InjFatLossByMonth"),
                             solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_month_comp_state")
                         )
                       ),
                       tabPanel("Chart",
                         fluidRow(
-                          box(title = "Illinois Injuries, fatalities and loss for each month",
+                          box(title = "Illinois Statistics By Month",
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_month_line")
                           )
                         ),
                         fluidRow(
-                          box(title = paste(comp_state_full, " Injuries, fatalities and loss for each month"),
+                          box(title = textOutput("InjFatLossByMonthChart"),
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_month_line_comp_state")
                           )
                         )
@@ -318,21 +340,21 @@ ui <- dashboardPage(
                  tabPanel("By Hour", 
                     tabBox(width=12,
                       tabPanel("Table",
-                        box(title = "Illinois Injuries, fatalities and loss for each hour",
+                        box(title = "Illinois Statistics By Hour",
                             solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour")
                         ),
-                        box(title = paste(comp_state_full," Injuries, fatalities and loss for each hour"),
+                        box(title = textOutput("InjFatLossByHour"),
                             solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour_comp_state")
                         )
                       ),
                       tabPanel("Chart",
                         fluidRow(
-                          box(title = "Illinois Injuries, fatalities and loss for each hour",
+                          box(title = "Illinois Statistics By Hour",
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_hour_line")
                           )
                         ),
                         fluidRow(
-                          box(title = paste(comp_state_full, " Injuries, fatalities and loss for each hour"),
+                          box(title = textOutput("InjFatLossByHourChart"),
                               solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_hour_line_comp_state")
                           )
                         )
@@ -540,6 +562,44 @@ server <- function(input, output) {
     )
   })
   
+  #Comparison State Titles
+  output$TornadoesByYear <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Year')
+  })
+  output$TornadoesByYearChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Year')
+  })
+  output$TornadoesByMonth <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Month')
+  })
+  output$TornadoesByMonthChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Month')
+  })
+  output$TornadoesByHour <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Hour')
+  })
+  output$TornadoesByHourChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Tornadoes By Hour')
+  })  
+  
+  output$InjFatLossByYear <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Year')
+  })
+  output$InjFatLossByYearChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Year')
+  })
+  output$InjFatLossByMonth <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Month')
+  })
+  output$InjFatLossByMonthChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Month')
+  })
+  output$InjFatLossByHour <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Hour')
+  })
+  output$InjFatLossByHourChart <- renderText({
+    paste(abbToName[input$comparisonState], ' Statistics By Hour')
+  })
   
   comp_state_abbrev <- "TX"
   
@@ -604,11 +664,17 @@ server <- function(input, output) {
   
   
   #table showing the number of tornadoes that occurred in every year (1955, 1956, etc)
-  table_per_year_func <- function (state_abbrev){
+  table_per_year_func <- function (state_abbrev=""){
     return (
       DT::renderDataTable(
         DT::datatable({
-          temp <- allData %>% filter(st == state_abbrev)
+          print(paste("passed state abb: ",state_abbrev))
+          print(paste("input$comparisonState: ",input$comparisonState))
+          if (state_abbrev == "IL"){
+            temp <- allData %>% filter(st == "IL")
+          } else {
+            temp <- allData %>% filter(st == input$comparisonState)
+          }
           temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
           temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
           "fill 0's in to dataset"
@@ -653,13 +719,18 @@ server <- function(input, output) {
   }
   
   output$table_per_year<- table_per_year_func("IL")
-  output$table_per_year_comp_state<- table_per_year_func(comp_state_abbrev)
+  #output$table_per_year_comp_state<- table_per_year_func(comp_state_abbrev)
+  output$table_per_year_comp_state<- table_per_year_func()
   
   #bar chart showing the number of tornadoes that occurred in every year (1955, 1956, etc)
-  stacked_bar_per_year_func <- function(state_abbrev) {
+  stacked_bar_per_year_func <- function(state_abbrev="") {
     return ( 
       renderPlot({
-        temp <- allData %>% filter(st == state_abbrev)
+        if (state_abbrev == "IL"){
+          temp <- allData %>% filter(st == "IL")
+        } else {
+          temp <- allData %>% filter(st == input$comparisonState)
+        }
         temp <- group_by(temp, yr, mag) %>% summarise(count = n()) %>% group_by(mag)
         temp2 <- temp %>% complete(yr, mag) %>% group_by(yr) %>% fill(mag)
         "fill 0's in to dataset"
@@ -673,14 +744,18 @@ server <- function(input, output) {
   }
   
   output$stacked_bar_per_year<- stacked_bar_per_year_func("IL")
-  output$stacked_bar_per_year_comp_state<- stacked_bar_per_year_func(comp_state_abbrev)
+  output$stacked_bar_per_year_comp_state<- stacked_bar_per_year_func()
   
   #table showing the number of tornadoes that occurred over all years for each month (Jan, Feb, etc)
-  table_per_month_func <- function(state_abbrev){
+  table_per_month_func <- function(state_abbrev=""){
     return (
       DT::renderDataTable(
       DT::datatable({
-        temp <- allData %>% filter(st == state_abbrev)
+        if (state_abbrev == "IL"){
+          temp <- allData %>% filter(st == "IL")
+        } else {
+          temp <- allData %>% filter(st == input$comparisonState)
+        }
         temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
         temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
         "fill 0's in to dataset"
@@ -702,6 +777,8 @@ server <- function(input, output) {
         
         "move the total to last col"
         temp3 <- temp3%>%select(-month_total,month_total)
+        names(temp3)[names(temp3)=="month_abb"] <- "Month"
+        names(temp3)[names(temp3)=="month_total"] <- "Total"
         
         "Remove Col user does not want to see"
         if(input$table_by_month_view == "numb")
@@ -715,19 +792,24 @@ server <- function(input, output) {
         
         finalChart
       },
+      rownames = FALSE,
       options = list(pageLength = 12))
       )
     )
   }
   
   output$table_per_month<- table_per_month_func("IL")
-  output$table_per_month_comp_state<- table_per_month_func(comp_state_abbrev)
+  output$table_per_month_comp_state<- table_per_month_func()
   
   #bar chart showing the number of tornadoes that occurred over all years for each month (Jan, Feb, etc)
-  stacked_bar_per_month_func <- function(state_abbrev){
+  stacked_bar_per_month_func <- function(state_abbrev=""){
     return (
       renderPlot({
-      temp <- allData %>% filter(st == state_abbrev)
+      if (state_abbrev == "IL"){
+        temp <- allData %>% filter(st == "IL")
+      } else {
+        temp <- allData %>% filter(st == input$comparisonState)
+      }
       temp <- group_by(temp, month_abb, mag) %>% summarise(count = n()) %>% group_by(mag)
       temp2 <- temp %>% complete(month_abb, mag) %>% group_by(month_abb) %>% fill(mag)
       "fill 0's in to dataset"
@@ -741,14 +823,18 @@ server <- function(input, output) {
   }
   
   output$stacked_bar_per_month<- stacked_bar_per_month_func("IL")
-  output$stacked_bar_per_month_comp_state<- stacked_bar_per_month_func(comp_state_abbrev)
+  output$stacked_bar_per_month_comp_state<- stacked_bar_per_month_func()
   
   #table showing the number of tornadoes that occurred over all years for each hour in 24-hour period
-  table_per_hour_func <- function(state_abbrev){
+  table_per_hour_func <- function(state_abbrev=""){
     return (
       DT::renderDataTable(
         DT::datatable({
-          temp <- allData %>% filter(st == state_abbrev)
+          if (state_abbrev == "IL"){
+            temp <- allData %>% filter(st == "IL")
+          } else {
+            temp <- allData %>% filter(st == input$comparisonState)
+          }
           temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
           temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
           "fill 0's in to dataset"
@@ -775,6 +861,8 @@ server <- function(input, output) {
           
           "move the total to last col"
           temp3 <- temp3%>%select(-hour_total,hour_total)
+          names(temp3)[names(temp3)=="hour"] <- "Hour"
+          names(temp3)[names(temp3)=="hour_total"] <- "Total"
           
           "Remove Col user does not want to see"
           if(input$table_by_hour_view == "numb")
@@ -788,19 +876,24 @@ server <- function(input, output) {
           
           finalChart
         },
+        rownames = FALSE,
         options = list(pageLength = 24))
       )
    )
   }
   
   output$table_per_hour<- table_per_hour_func("IL")
-  output$table_per_hour_comp_state<- table_per_hour_func(comp_state_abbrev)
+  output$table_per_hour_comp_state<- table_per_hour_func()
   
   #bar chart showing the number of tornadoes that occurred over all years for each hour in 24-hour period
-  stacked_bar_per_hour_func <- function(state_abbrev){
+  stacked_bar_per_hour_func <- function(state_abbrev=""){
     return (
       renderPlot({
-        temp <- allData %>% filter(st == state_abbrev)
+        if (state_abbrev == "IL"){
+          temp <- allData %>% filter(st == "IL")
+        } else {
+          temp <- allData %>% filter(st == input$comparisonState)
+        }
         temp <- group_by(temp, hour, mag) %>% summarise(count = n()) %>% group_by(mag)
         temp2 <- temp %>% complete(hour, mag) %>% group_by(hour) %>% fill(mag)
         "fill 0's in to dataset"
@@ -820,15 +913,19 @@ server <- function(input, output) {
   }
   
   output$stacked_bar_per_hour<- stacked_bar_per_hour_func("IL")
-  output$stacked_bar_per_hour_comp_state<- stacked_bar_per_hour_func(comp_state_abbrev)
+  output$stacked_bar_per_hour_comp_state<- stacked_bar_per_hour_func()
   
-  ### Injuries, Fatalities, Losses 
+  ######## Injuries, Fatalities, Losses 
   #table showing the injuries, fatalities, loss  all years
-  inj_fat_loss_year_func <- function(state_abbrev){
+  inj_fat_loss_year_func <- function(state_abbrev=""){
      return (
           DT::renderDataTable(
             DT::datatable({
-              temp <- allData %>% filter(st == state_abbrev)
+              if (state_abbrev == "IL"){
+                temp <- allData %>% filter(st == "IL")
+              } else {
+                temp <- allData %>% filter(st == input$comparisonState)
+              }
               n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
               n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
               n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
@@ -839,8 +936,17 @@ server <- function(input, output) {
               inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_max)
               
               inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
+              
+              names(inj_fat_loss_year)[names(inj_fat_loss_year)=="yr"] <- "Year"
+              names(inj_fat_loss_year)[names(inj_fat_loss_year)=="inj"] <- "Injuries"
+              names(inj_fat_loss_year)[names(inj_fat_loss_year)=="fat"] <- "Fatalities"
+              names(inj_fat_loss_year)[names(inj_fat_loss_year)=="loss_min"] <- "Min Loss"
+              names(inj_fat_loss_year)[names(inj_fat_loss_year)=="loss_max"] <- "Max Loss"
+              
               inj_fat_loss_year
+              
             },
+            rownames=FALSE,
             options = list(pageLength = 24)
             )
           )
@@ -848,13 +954,17 @@ server <- function(input, output) {
    }
   
   output$inj_fat_loss_year <- inj_fat_loss_year_func("IL")
-  output$inj_fat_loss_year_comp_state <- inj_fat_loss_year_func(comp_state_abbrev)
+  output$inj_fat_loss_year_comp_state <- inj_fat_loss_year_func()
   
   #chart showing the injuries, fatalities, loss  all years
-  inj_fat_loss_year_line_func <- function(state_abbrev){
+  inj_fat_loss_year_line_func <- function(state_abbrev=""){
     return (
       renderPlot({
-        temp <- allData %>% filter(st == state_abbrev)
+        if (state_abbrev == "IL"){
+          temp <- allData %>% filter(st == "IL")
+        } else {
+          temp <- allData %>% filter(st == input$comparisonState)
+        }
         n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
         n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
         n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
@@ -877,14 +987,18 @@ server <- function(input, output) {
   }
   
   output$inj_fat_loss_year_line <- inj_fat_loss_year_line_func("IL")
-  output$inj_fat_loss_year_line_comp_state <- inj_fat_loss_year_line_func("TX")
+  output$inj_fat_loss_year_line_comp_state <- inj_fat_loss_year_line_func()
     
   # table showing the injuries, fatalities, loss per month summed over all years
-  inj_fat_loss_month_func <- function(state_abbrev){
+  inj_fat_loss_month_func <- function(state_abbrev=""){
     return (
       DT::renderDataTable(
         DT::datatable({
-          temp <- allData %>% filter(st == state_abbrev)
+          if (state_abbrev == "IL"){
+            temp <- allData %>% filter(st == "IL")
+          } else {
+            temp <- allData %>% filter(st == input$comparisonState)
+          }
           n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
           n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
           n_loss_month_min <- aggregate(loss_min ~ month_abb, data = temp, sum)
@@ -895,8 +1009,16 @@ server <- function(input, output) {
           inj_fat_loss_month <- merge(inj_fat_loss_month,n_loss_month_max)
           
           inj_fat_loss_month <- as.data.frame(inj_fat_loss_month)
+          
+          names(inj_fat_loss_month)[names(inj_fat_loss_month)=="yr"] <- "Year"
+          names(inj_fat_loss_month)[names(inj_fat_loss_month)=="inj"] <- "Injuries"
+          names(inj_fat_loss_month)[names(inj_fat_loss_month)=="fat"] <- "Fatalities"
+          names(inj_fat_loss_month)[names(inj_fat_loss_month)=="loss_min"] <- "Min Loss"
+          names(inj_fat_loss_month)[names(inj_fat_loss_month)=="loss_max"] <- "Max Loss"
+          
           inj_fat_loss_month
         },
+        rownames=FALSE,
         options = list(pageLength = 12, order = list(list(1, 'asc')))
         )
       )
@@ -904,13 +1026,17 @@ server <- function(input, output) {
   }
   
   output$inj_fat_loss_month <- inj_fat_loss_month_func("IL") 
-  output$inj_fat_loss_month_comp_state <- inj_fat_loss_month_func(comp_state_abbrev)
+  output$inj_fat_loss_month_comp_state <- inj_fat_loss_month_func()
   
   # chart showing the injuries, fatalities, loss per month summed over all years
-  inj_fat_loss_month_line_func <- function(state_abbrev){
+  inj_fat_loss_month_line_func <- function(state_abbrev=""){
     return (
       renderPlot({
-        temp <- allData %>% filter(st == state_abbrev)
+        if (state_abbrev == "IL"){
+          temp <- allData %>% filter(st == "IL")
+        } else {
+          temp <- allData %>% filter(st == input$comparisonState)
+        }
         n_inj_month <- aggregate(inj ~ month_abb, data = temp, sum)
         n_fat_month <- aggregate(fat ~ month_abb, data = temp, sum)
         n_loss_month_min <- aggregate(loss_min ~ month_abb, data = temp, sum)
@@ -933,14 +1059,18 @@ server <- function(input, output) {
   }
   
   output$inj_fat_loss_month_line <- inj_fat_loss_month_line_func("IL")
-  output$inj_fat_loss_month_line_comp_state <- inj_fat_loss_month_line_func(comp_state_abbrev)
+  output$inj_fat_loss_month_line_comp_state <- inj_fat_loss_month_line_func()
   
   # table showing the injuries, fatalities, loss per hour summed over all years
-  inj_fat_loss_hour_func <- function(state_abbrev){
+  inj_fat_loss_hour_func <- function(state_abbrev=""){
      return (
         DT::renderDataTable(
           DT::datatable({
-            temp <- allData %>% filter(st == state_abbrev)
+            if (state_abbrev == "IL"){
+              temp <- allData %>% filter(st == "IL")
+            } else {
+              temp <- allData %>% filter(st == input$comparisonState)
+            }
             n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
             n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
             n_loss_hour_min <- aggregate(loss_min ~ hour, data = temp, sum)
@@ -955,8 +1085,14 @@ server <- function(input, output) {
             inj_fat_loss_hour$hour <- set_time_factor(inj_fat_loss_hour$hour)
             
             inj_fat_loss_hour <- as.data.frame(inj_fat_loss_hour)
+            names(inj_fat_loss_hour)[names(inj_fat_loss_hour)=="hour"] <- "Hour"
+            names(inj_fat_loss_hour)[names(inj_fat_loss_hour)=="inj"] <- "Injuries"
+            names(inj_fat_loss_hour)[names(inj_fat_loss_hour)=="fat"] <- "Fatalities"
+            names(inj_fat_loss_hour)[names(inj_fat_loss_hour)=="loss_min"] <- "Min Loss"
+            names(inj_fat_loss_hour)[names(inj_fat_loss_hour)=="loss_max"] <- "Max Loss"
             inj_fat_loss_hour
           },
+          rownames=FALSE,
           options = list(pageLength = 24)
           )
         )
@@ -964,14 +1100,18 @@ server <- function(input, output) {
    }
   
   output$inj_fat_loss_hour <- inj_fat_loss_hour_func("IL")
-  output$inj_fat_loss_hour_comp_state <- inj_fat_loss_hour_func(comp_state_abbrev)
+  output$inj_fat_loss_hour_comp_state <- inj_fat_loss_hour_func()
   
   # chart showing the injuries, fatalities, loss per hour summed over all years
-  inj_fat_loss_hour_line_func <- function(state_abbrev){
+  inj_fat_loss_hour_line_func <- function(state_abbrev=""){
     return (
       renderPlot(
         {
-          temp <- allData %>% filter(st == state_abbrev)
+          if (state_abbrev == "IL"){
+            temp <- allData %>% filter(st == "IL")
+          } else {
+            temp <- allData %>% filter(st == input$comparisonState)
+          }
           n_inj_hour <- aggregate(inj ~ hour, data = temp, sum)
           n_fat_hour <- aggregate(fat ~ hour, data = temp, sum)
           n_loss_hour_min <- aggregate(loss_min ~ hour, data = temp, sum)
@@ -998,7 +1138,7 @@ server <- function(input, output) {
   }
   
   output$inj_fat_loss_hour_line <- inj_fat_loss_hour_line_func("IL") 
-  output$inj_fat_loss_hour_line_comp_state <- inj_fat_loss_hour_line_func(comp_state_abbrev) 
+  output$inj_fat_loss_hour_line_comp_state <- inj_fat_loss_hour_line_func()
  
   #### Illinois-specific charts and tables
  
