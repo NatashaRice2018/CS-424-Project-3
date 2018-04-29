@@ -3,6 +3,19 @@ require(datasets)
 
 "read in the data"
 allData<- read.table(file = "1950-2016_all_tornadoes.csv", header = TRUE,sep = ',') 
+allData3<- read.table(file = "top10.csv", header = TRUE,sep = ',') 
+
+
+"Top 10 file "
+allData3$date_time <- as.POSIXct(paste(allData$date, allData$time), format = "%Y-%m-%d %H:%M:%S" )
+"get some other string info for data"
+allData3$day_string <- weekdays(allData$date_time)
+allData3$hour <-lubridate::hour(allData$date_time)
+allData3$month_abb <- month.abb[allData$mo]
+allData3$month_abb <- factor(allData$month_abb, levels = month.abb)
+allData3$date <- date(allData$date_time)
+allData3$time <- time[allData$time]
+
 "Convert data to date-time format"
 allData$date_time <- as.POSIXct(paste(allData$date, allData$time), format = "%Y-%m-%d %H:%M:%S" )
 "get some other string info for data"
