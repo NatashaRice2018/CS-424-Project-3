@@ -145,7 +145,8 @@ ui <- dashboardPage(
               ),
               numericInput("max","Set value for year to start:", value = 1998),
               uiOutput("slider"),
-              leafletOutput("animate",height = 850)
+              leafletOutput("animate",height = 850),
+              dataTableOutput("animation_year")
               ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
@@ -1450,6 +1451,58 @@ server <- function(input, output) {
       setView(lng = -93.85, lat = 37.45, zoom = 6)
   })
   
+  animation_year_func <- function(state_abbrev=""){
+    
+      
+        
+          if (state_abbrev == "IL"){
+            temp <- allData %>% filter(st == "IL")
+          } else {
+            temp <- allData %>% filter(st == input$comparisonState)
+          }
+          n_inj_year <- aggregate(inj ~ yr, data = temp, sum)
+          n_fat_year <- aggregate(fat ~ yr, data = temp, sum)
+          n_loss_year_min <- aggregate(loss_min ~ yr, data = temp, sum)
+          n_loss_year_max <- aggregate(loss_max ~ yr, data = temp, sum)
+          
+          inj_fat_loss_year <- merge(n_inj_year,n_fat_year)
+          inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_min)
+          inj_fat_loss_year <- merge(inj_fat_loss_year,n_loss_year_max)
+          
+          inj_fat_loss_year <- as.data.frame(inj_fat_loss_year)
+          
+          names(inj_fat_loss_year)[names(inj_fat_loss_year)=="yr"] <- "Year"
+          names(inj_fat_loss_year)[names(inj_fat_loss_year)=="inj"] <- "Injuries"
+          names(inj_fat_loss_year)[names(inj_fat_loss_year)=="fat"] <- "Fatalities"
+          names(inj_fat_loss_year)[names(inj_fat_loss_year)=="loss_min"] <- "Min Loss"
+          names(inj_fat_loss_year)[names(inj_fat_loss_year)=="loss_max"] <- "Max Loss"
+          inj_fat_loss_year
+      
+      }
+  
+  output$animation_year <- DT::renderDataTable(animation_year_func("IL"))
+    
+  
+  proxy_table <- dataTableProxy('animation_year')
+  
+ 
+  
+  test_func <- function(x){
+    #data <-  animation_year_func("IL")
+    test_data <-  animation_year_func("IL")
+    l <- list()
+    for(i in 1:nrow(test_data)){
+    
+      if (test_data[i,]$Year== x){
+         l<-append(l,i)
+      }
+        
+    }
+    l
+  }
+  
+ 
+    
   observeEvent(input$slider2,{
     temp <- subset(filtered(),yr == input$slider2)
     map3 <- leafletProxy("animate") %>% clearShapes()
@@ -1460,6 +1513,12 @@ server <- function(input, output) {
     map3 = set_paths_by_mag(3, map3, temp)
     map3 = set_paths_by_mag(4, map3, temp)
     map3 = set_paths_by_mag(5, map3, temp)
+    
+    #ids <- test_func(input$slider2)
+    #if(length(ids)==0) proxy_table %>% selectRows(NULL) else proxy_table %>% selectRows(ids)
+    temp_l <- test_func(x=input$slider2)
+    proxy_table %>% selectRows(temp_l)
+    
   })
   
   
