@@ -414,6 +414,9 @@ ui <- dashboardPage(
               #   ),
                 box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12, height=1900,
                     leafletOutput("topDestructive", height=1600)
+                ),
+                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12,
+                    dataTableOutput("topDestructiveTable")
                 )
               ), # end of column
               column(width=4,
@@ -1373,6 +1376,40 @@ server <- function(input, output) {
     map3
   })
   
+  output$topDestructiveTable <- DT::renderDataTable(
+    DT::datatable({
+      temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
+      temp <- head(temp[order(temp$our_top, decreasing = T),], n = 10)
+      
+      cols <- c("month_abb", "dy", "yr")
+      temp$fulldate <- do.call(paste, c(temp[cols], sep=" "))
+      colsToInclude <- c("fulldate", "yr", "day_string", "county", "mag", "inj", "fat", "avg_loss", "our_top")
+      temp <- temp[,colsToInclude]
+      
+      temp <- temp %>% mutate(avg_loss = formatC(round(avg_loss), format = "f", big.mark = ",", drop0trailing = TRUE))
+      temp <- temp %>% mutate(our_top = formatC(round(our_top), format = "f", big.mark = ",", drop0trailing = TRUE))
+      
+      names(temp)[names(temp)=="yr"] <- "Year"
+      names(temp)[names(temp)=="fulldate"] <- "Date"
+      names(temp)[names(temp)=="day_string"] <- "Day"
+      names(temp)[names(temp)=="county"] <- "County"
+      names(temp)[names(temp)=="mag"] <- "Magnitude"
+      names(temp)[names(temp)=="inj"] <- "Injuries"
+      names(temp)[names(temp)=="fat"] <- "Fatalities"
+      names(temp)[names(temp)=="avg_loss"] <- "Loss"
+      names(temp)[names(temp)=="our_top"] <- "Score"
+      
+      #temp <- allData %>% filter(st == "IL")
+      temp <- as.data.frame(temp)
+      #most_hit_counties <- group_by(temp,county) %>% summarise(count=n()) %>% arrange(desc(count)) %>% top_n(15)
+      #most_hit_counties <- as.data.frame(most_hit_counties)
+      #most_hit_counties
+    },
+    rownames=FALSE,
+    options = list(pageLength = 10,columnDefs = list(list(className = 'dt-right', targets = 4:8)))
+    )
+  )
+  
   output$topDestructive <- renderLeaflet({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     
@@ -1439,22 +1476,19 @@ server <- function(input, output) {
     sliderInput("slider2","Dynamic animation", max= max(allData$yr), min=min(allData$yr), value=input$max, step=1,
                 animate=animationOptions(800))
   })
-  
+ 
+  # Animated map 
   filtered <- reactive({allData %>% filter(st == "IL", yr == input$slider2,elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)})
   output$animate <- renderLeaflet({
-    
-    
     "All options for map views"
     "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
     
     leaflet() %>% addTiles(group = "OSM (default)") %>% 
       setView(lng = -93.85, lat = 37.45, zoom = 6)
   })
-  
+ 
+  #animated table  
   animation_year_func <- function(state_abbrev=""){
-    
-      
-        
           if (state_abbrev == "IL"){
             temp <- allData %>% filter(st == "IL")
           } else {
@@ -1481,11 +1515,8 @@ server <- function(input, output) {
       }
   
   output$animation_year <- DT::renderDataTable(animation_year_func("IL"))
-    
   
   proxy_table <- dataTableProxy('animation_year')
-  
- 
   
   test_func <- function(x){
     #data <-  animation_year_func("IL")
@@ -1500,8 +1531,6 @@ server <- function(input, output) {
     }
     l
   }
-  
- 
     
   observeEvent(input$slider2,{
     temp <- subset(filtered(),yr == input$slider2)
