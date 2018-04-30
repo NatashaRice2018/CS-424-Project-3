@@ -1555,10 +1555,10 @@ server <- function(input, output) {
     #if(length(ids)==0) proxy_table %>% selectRows(NULL) else proxy_table %>% selectRows(ids)
     temp_l <- test_func(x=input$slider2)
     #proxy_table %>% selectRows(temp_l)
-    proxy_table_per_year %>% selectRows(temp_l)
-    proxy_table_per_year_comp_state %>% selectRows(temp_l)
-    proxy_inj_fat_loss_per_year %>% selectRows(temp_l)
-    proxy_inj_fat_loss_per_year_comp_state %>% selectRows(temp_l)
+    proxy_table_per_year %>% selectRows(temp_l)%>% selectPage(as.numeric(temp_l)%/%24 +1)
+    proxy_table_per_year_comp_state %>% selectRows(temp_l) %>% selectPage(as.numeric(temp_l)%/%24 +1)
+    proxy_inj_fat_loss_per_year %>% selectRows(temp_l)  %>% selectPage(as.numeric(temp_l)%/%24 +1)
+    proxy_inj_fat_loss_per_year_comp_state %>% selectRows(temp_l)  %>% selectPage(as.numeric(temp_l)%/%24 +1)
   })
   
   
