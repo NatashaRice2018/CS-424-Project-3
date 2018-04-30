@@ -94,7 +94,6 @@ ui <- dashboardPage(
       menuItem("Tornado Facts", tabName="number_of_tornadoes"),
       menuItem("Illinois Tornado Facts", tabName="tornado_damage"),
       menuItem("Tornado Tracks", tabName="tornado_tracks"),
-      menuItem("Grad", tabName="Grad_Part"),
       menuItem("Time",
                box(
                  selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
@@ -122,34 +121,10 @@ ui <- dashboardPage(
               h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu"),
               a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
       ),
-      tabItem("Grad_Part",
-              sliderInput("opacity", "Opacity:",
-                          min = 0, max = 1,
-                          value = 0.6, step = 0.05),
-              sliderInput("radius", "Radius:",
-                          min = 0, max = 50,
-                          value = 16),
-              sliderInput("blur", "Blur:",
-                          min = 0, max = 30,
-                          value = 14, step = 2),
-              
-              box(title="Select Month",solidHeader = TRUE, status="primary",selectInput("mon_grad","Select Month",
-                                                                                        list(
-                                                                                          "Spring" = c("Mar","Apr","May"),
-                                                                                          "Summer" = c("Jun","Jul","Aug"),
-                                                                                          "Fall" = c("Sep","Oct","Nov"),
-                                                                                          "Winter" = c("Dec","Jan","Feb")
-                                                                                        ))),
-              box(title = "Heat Map", solidHeader = TRUE, status = "primary", width = 12, height=925,
-                  leafletOutput("heat", height=850)
-              ),
-              numericInput("max","Set value for year to start:", value = 1998),
-              uiOutput("slider"),
-              leafletOutput("animate",height = 850),
-              dataTableOutput("animation_year")
-              ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
+            h2(textOutput("comparisonStateTextOutput"), style="text-align:center; font-size:70px; background-color: black; color: white;
+                                           padding-top:10px; padding-bottom:10px"),
             column(width=4,
                 h2("Tornado Sightings: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
@@ -274,6 +249,19 @@ ui <- dashboardPage(
               ) # End column
                , # End TabBox for Tornado Facts
             
+            column(width=4,
+              fluidRow(width=12,
+                box(width=6,
+                  numericInput("max","Set value for year to start:", value = 1998)
+                ),
+                box(width=6,
+                  uiOutput("slider")
+                )
+              ),
+              box(title = "Animation of Illinois Tornadoes", solidHeader = TRUE, status = "primary", width = 12, height=925,
+                leafletOutput("animate", height=1800)
+              )
+            ),
 ################ Map for Illinois Tornado Paths Animation ##################
                #tabBox(width=3,
                #   box(title = "Illinois Tornado Paths Animation", solidHeader = TRUE, status = "primary", width = 12, height=2100,
@@ -371,7 +359,7 @@ ui <- dashboardPage(
             
       ),
       tabItem("tornado_damage",
-              column(width=4,
+              column(width=3,
                 h2("Illinois Counties Most Hit By Tornados: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
                 box(title = "Most Hit Counties",
@@ -381,37 +369,32 @@ ui <- dashboardPage(
                     
                 )
               ),
-              column(width=4,
+              column(width = 3,
+                fluidRow(width=12,
+                  sliderInput("opacity", "Opacity:",
+                              min = 0, max = 1,
+                              value = 0.6, step = 0.05),
+                  sliderInput("radius", "Radius:",
+                              min = 0, max = 50,
+                              value = 16),
+                  sliderInput("blur", "Blur:",
+                              min = 0, max = 30,
+                              value = 14, step = 2)
+                ),
+                box(width=12, title="Select Month",solidHeader = TRUE, status="primary",selectInput("mon_grad","Select Month",
+                                                                                          list(
+                                                                                            "Spring" = c("Mar","Apr","May"),
+                                                                                            "Summer" = c("Jun","Jul","Aug"),
+                                                                                            "Fall" = c("Sep","Oct","Nov"),
+                                                                                            "Winter" = c("Dec","Jan","Feb")
+                                                                                          ))),
+                box(width=12, title = "Heat Map", solidHeader = TRUE, status = "primary",height=925,
+                    leafletOutput("heat", height=850)
+                )
+              ),
+              column(width=3,
                 h2("Most Destructive Tornados in Illinois: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
-              #   titlePanel("Destruction Parameters"),
-              #   sidebarPanel(
-              #     # Input: Simple integer interval ----
-              #     sliderInput("integer", "Fatalities:",
-              #                 min = 0, max = 1000,
-              #                 value = 500),
-              #     # Input: Decimal interval with step value ----
-              #     sliderInput("decimal", "Injuries:",
-              #                 min = 0, max = 1,
-              #                 value = 0.5, step = 0.1),
-              #     # Input: Specification of range within an interval ----
-              #     sliderInput("range", "Duration of Tornado:",
-              #                 min = 1, max = 1000,
-              #                 value = c(200,500)),
-              #     # Input: Custom currency format for with basic animation ----
-              #     sliderInput("format", "Property Loss Cost:",
-              #                 min = 0, max = 10000,
-              #                 value = 0, step = 2500,
-              #                 pre = "$", sep = ",",
-              #                 animate = TRUE),
-              #     # Input: Animation with custom interval (in ms) ----
-              #     # to control speed, plus looping
-              #     sliderInput("animation", "Looping Animation:",
-              #                 min = 1, max = 2000,
-              #                 value = 1, step = 10,
-              #                 animate =
-              #                   animationOptions(interval = 300, loop = TRUE))
-              #   ),
                 box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12, height=1900,
                     leafletOutput("topDestructive", height=1600)
                 ),
@@ -419,7 +402,7 @@ ui <- dashboardPage(
                     dataTableOutput("topDestructiveTable")
                 )
               ), # end of column
-              column(width=4,
+              column(width=3,
                 h2("Tornados by Distance From Chicago: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
                 box(title = "Tornadoes by Distance From Chicago", solidHeader = TRUE, status = "primary",width = 12,
@@ -570,6 +553,10 @@ server <- function(input, output) {
   })
   
   #Comparison State Titles
+  output$comparisonStateTextOutput <- renderText({
+    paste('Illinois vs. ', abbToName[input$comparisonState])
+  })
+  
   output$TornadoesByYear <- renderText({
     paste(abbToName[input$comparisonState], ' Tornadoes By Year')
   })
@@ -726,7 +713,6 @@ server <- function(input, output) {
   }
   
   output$table_per_year<- table_per_year_func("IL")
-  #output$table_per_year_comp_state<- table_per_year_func(comp_state_abbrev)
   output$table_per_year_comp_state<- table_per_year_func()
   
   #bar chart showing the number of tornadoes that occurred in every year (1955, 1956, etc)
@@ -1381,11 +1367,13 @@ server <- function(input, output) {
       temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
       temp <- head(temp[order(temp$our_top, decreasing = T),], n = 10)
       
+      # Create the Date Column
       cols <- c("month_abb", "dy", "yr")
       temp$fulldate <- do.call(paste, c(temp[cols], sep=" "))
       colsToInclude <- c("fulldate", "yr", "day_string", "county", "mag", "inj", "fat", "avg_loss", "our_top")
       temp <- temp[,colsToInclude]
-      
+     
+      # Format the numbers with the commas
       temp <- temp %>% mutate(avg_loss = formatC(round(avg_loss), format = "f", big.mark = ",", drop0trailing = TRUE))
       temp <- temp %>% mutate(our_top = formatC(round(our_top), format = "f", big.mark = ",", drop0trailing = TRUE))
       
@@ -1399,11 +1387,7 @@ server <- function(input, output) {
       names(temp)[names(temp)=="avg_loss"] <- "Loss"
       names(temp)[names(temp)=="our_top"] <- "Score"
       
-      #temp <- allData %>% filter(st == "IL")
       temp <- as.data.frame(temp)
-      #most_hit_counties <- group_by(temp,county) %>% summarise(count=n()) %>% arrange(desc(count)) %>% top_n(15)
-      #most_hit_counties <- as.data.frame(most_hit_counties)
-      #most_hit_counties
     },
     rownames=FALSE,
     options = list(pageLength = 10,columnDefs = list(list(className = 'dt-right', targets = 4:8)))
@@ -1478,12 +1462,16 @@ server <- function(input, output) {
   })
  
   # Animated map 
-  filtered <- reactive({allData %>% filter(st == "IL", yr == input$slider2,elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)})
+  filtered <- reactive({
+    target <- c("IL", input$comparisonState)
+    allData %>% filter(st %in% target, yr == input$slider2,elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0, as.numeric(mag) >= 0)})
+  
   output$animate <- renderLeaflet({
     "All options for map views"
     "http://leaflet-extras.github.io/leaflet-providers/preview/index.html"
     
     leaflet() %>% addTiles(group = "OSM (default)") %>% 
+      addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
       setView(lng = -93.85, lat = 37.45, zoom = 6)
   })
  
@@ -1517,6 +1505,10 @@ server <- function(input, output) {
   output$animation_year <- DT::renderDataTable(animation_year_func("IL"))
   
   proxy_table <- dataTableProxy('animation_year')
+  proxy_table_per_year <- dataTableProxy('table_per_year')
+  proxy_table_per_year_comp_state <- dataTableProxy('table_per_year_comp_state')
+  proxy_inj_fat_loss_per_year<- dataTableProxy('inj_fat_loss_year')
+  proxy_inj_fat_loss_per_year_comp_state<- dataTableProxy('inj_fat_loss_year_comp_state')
   
   test_func <- function(x){
     #data <-  animation_year_func("IL")
@@ -1546,8 +1538,11 @@ server <- function(input, output) {
     #ids <- test_func(input$slider2)
     #if(length(ids)==0) proxy_table %>% selectRows(NULL) else proxy_table %>% selectRows(ids)
     temp_l <- test_func(x=input$slider2)
-    proxy_table %>% selectRows(temp_l)
-    
+    #proxy_table %>% selectRows(temp_l)
+    proxy_table_per_year %>% selectRows(temp_l)
+    proxy_table_per_year_comp_state %>% selectRows(temp_l)
+    proxy_inj_fat_loss_per_year %>% selectRows(temp_l)
+    proxy_inj_fat_loss_per_year_comp_state %>% selectRows(temp_l)
   })
   
   
