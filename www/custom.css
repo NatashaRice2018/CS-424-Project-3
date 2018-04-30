@@ -1,6 +1,26 @@
 
+.slider-animate-container{
+  margin-top:0px;
+}
+
 /*Font size of table titles*/
 .box-header .box-title{
+  font-size:32px;
+}
+
+.irs-grid {
+  font-size:20px;
+}
+
+.shiny-bound-input{
+  font-size:32px;
+}
+
+.shiny-input-container{
+  font-size:32px;
+}
+
+.control-label{
   font-size:32px;
 }
 
