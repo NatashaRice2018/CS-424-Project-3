@@ -91,7 +91,7 @@ ui <- dashboardPage(
     width= 650,
     sidebarMenu(
       menuItem("National Tornado Facts", tabName="number_of_tornadoes"),
-      menuItem("National Tornado Track Details", tabName="tornado_tracks"),
+      menuItem("National Tornado Path Details", tabName="tornado_tracks"),
       menuItem("Illinois Tornado Facts", tabName="tornado_damage"),
       menuItem("About", tabName="about"),
       menuItem("Time",
@@ -119,7 +119,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem("about",
               div(style="background:white; width:3000px; height:2000px",
-                h1("'You Spin Me Round' is a data visualization project of tornados in the United States from 1950 to 2016, with a special focus on Illinois.", style="font-size:80px"),
+                h1("'You Spin Me Round' is a data visualization project of tornadoes in the United States from 1950 to 2016, with a special focus on Illinois.", style="font-size:80px"),
                 h1("This project was created in partial fulfillment of Prof. Andrew Johnson's CS 424: Visualization and Visual Analytics course at the University of Illinois at Chicago.", style="font-size:80px"),
                 h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu", style="font-size:60px"),
                 h1(a("View our Project Write-Up and Documentation", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/",style="font-size:60px")),
@@ -134,8 +134,8 @@ ui <- dashboardPage(
             column(width=4,
                 h2("Tornado Sightings", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
-                tabBox(width=12,height=2150,
-                  tabPanel("Tornados By Year", 
+                tabBox(width=12,height=1900,
+                  tabPanel("Tornadoes By Year", 
                      tabBox(width=12,
                        tabPanel("Table",
                         box(title = "Illinois Tornadoes By Year", solidHeader = TRUE, status = "primary",width = 6,
@@ -161,20 +161,20 @@ ui <- dashboardPage(
                        ),
                        tabPanel("Chart",
                         fluidRow(
-                          box(title = "Illinois Tornadoes By Year", solidHeader = TRUE, status = "primary", width = 12, height=925,
-                               plotOutput("stacked_bar_per_year", height=850)
+                          box(title = "Illinois Tornadoes By Year", solidHeader = TRUE, status = "primary", width = 12, height=825,
+                               plotOutput("stacked_bar_per_year", height=750)
                           )
                         ),
                         fluidRow(
-                          box(title = textOutput("TornadoesByYearChart"), solidHeader = TRUE, status = "primary", width = 12, height=925,
+                          box(title = textOutput("TornadoesByYearChart"), solidHeader = TRUE, status = "primary", width = 12, height=825,
         
-                               plotOutput("stacked_bar_per_year_comp_state", height=850)
+                               plotOutput("stacked_bar_per_year_comp_state", height=750)
                           )
                         )
                        )
                     )
                   ),
-                  tabPanel("Tornados By Month",
+                  tabPanel("Tornadoes By Month",
                      tabBox(width=12,
                        tabPanel("Table",
                         box(title = "Illinois Tornadoes by Month", solidHeader = TRUE, status = "primary",width = 6,
@@ -200,20 +200,20 @@ ui <- dashboardPage(
                        ),
                        tabPanel("Chart",
                           fluidRow(
-                            box( title = "Illinois Tornadoes By Month", solidHeader = TRUE, status = "primary", width = 12,
-                                 plotOutput("stacked_bar_per_month")
+                            box( title = "Illinois Tornadoes By Month", solidHeader = TRUE, status = "primary", width = 12, height=825,
+                                 plotOutput("stacked_bar_per_month", height=750)
                             )
                           ),
                           fluidRow(
-                            box(title = textOutput("TornadoesByMonthChart"), solidHeader = TRUE, status = "primary", width = 12,
-                                 plotOutput("stacked_bar_per_month_comp_state")
+                            box(title = textOutput("TornadoesByMonthChart"), solidHeader = TRUE, status = "primary", width = 12, height=825,
+                                 plotOutput("stacked_bar_per_month_comp_state", height=750)
                             )
                           )
                        )
                      )
                  ),
                  
-                  tabPanel("Tornados By Hour",
+                  tabPanel("Tornadoes By Hour",
                            tabBox(width=12,
                              tabPanel("Table",
                                 box(title = "Illinois Tornadoes by Hour", solidHeader = TRUE, status = "primary",width = 6,
@@ -239,13 +239,13 @@ ui <- dashboardPage(
                              ),
                              tabPanel("Chart",
                                 fluidRow(
-                                  box( title = "Illinois Tornadoes By Hour", solidHeader = TRUE, status = "primary", width = 12,
-                                       plotOutput("stacked_bar_per_hour")
+                                  box( title = "Illinois Tornadoes By Hour", solidHeader = TRUE, status = "primary", width = 12, height=825,
+                                       plotOutput("stacked_bar_per_hour", height=750)
                                   )
                                 ),
                                 fluidRow(
-                                  box( title = textOutput("TornadoesByHourChart"), solidHeader = TRUE, status = "primary", width = 12,
-                                       plotOutput("stacked_bar_per_hour_comp_state")
+                                  box( title = textOutput("TornadoesByHourChart"), solidHeader = TRUE, status = "primary", width = 12, height=825,
+                                       plotOutput("stacked_bar_per_hour_comp_state", height=750)
                                   )
                                 )
                              ) #end tab panel
@@ -256,12 +256,12 @@ ui <- dashboardPage(
                , # End TabBox for Tornado Facts
             
             column(width=4, style="background-color:white",
-              fluidRow(width=12, style="background-color:white",
+              fluidRow(width=12, style="background-color:white", height=1900,
                 h2("Tornado Paths (Animation)", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
                 box(width=12,
                   column(width=4,
-                    numericInput("max","Start Year", value = 1998)
+                    numericInput("max","Start Year", value = 1950)
                   ),
                   column(width=8,
                     uiOutput("slider")
@@ -269,7 +269,7 @@ ui <- dashboardPage(
                 )
               ),
               box(status = "primary", width = 12,
-                leafletOutput("animate", height=1800)
+                leafletOutput("animate", height=1650)
               )
             ),
 ################ Map for Illinois Tornado Paths Animation ##################
@@ -289,7 +289,7 @@ ui <- dashboardPage(
             column(width=4,
                h2("Tornado Injuries, Fatalities, and Losses", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
-               tabBox(width=12,
+               tabBox(width=12, height=1900,
                  tabPanel("By Year", 
                     tabBox(width=12,
                       tabPanel("Table",
@@ -304,12 +304,14 @@ ui <- dashboardPage(
                       tabPanel("Chart",
                         fluidRow(
                           box(title = "Illinois Statistics By Year",
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_year_line")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_year_line", height=750)
                           )
                         ),
                         fluidRow(
                           box(title = textOutput("InjFatLossByYearChart"),
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_year_line_comp_state")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_year_line_comp_state", height=750)
                           )
                         )
                       )
@@ -328,12 +330,14 @@ ui <- dashboardPage(
                       tabPanel("Chart",
                         fluidRow(
                           box(title = "Illinois Statistics By Month",
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_month_line")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_month_line", height=700)
                           )
                         ),
                         fluidRow(
                           box(title = textOutput("InjFatLossByMonthChart"),
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_month_line_comp_state")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_month_line_comp_state", height=700)
                           )
                         )
                       )
@@ -343,21 +347,25 @@ ui <- dashboardPage(
                     tabBox(width=12,
                       tabPanel("Table",
                         box(title = "Illinois Statistics By Hour",
-                            solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour")
+                            solidHeader = TRUE, status = "primary",width = 6,
+                            dataTableOutput("inj_fat_loss_hour")
                         ),
                         box(title = textOutput("InjFatLossByHour"),
-                            solidHeader = TRUE, status = "primary",width = 6,dataTableOutput("inj_fat_loss_hour_comp_state")
+                            solidHeader = TRUE, status = "primary",width = 6,
+                            dataTableOutput("inj_fat_loss_hour_comp_state")
                         )
                       ),
                       tabPanel("Chart",
                         fluidRow(
                           box(title = "Illinois Statistics By Hour",
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_hour_line")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_hour_line", height=750)
                           )
                         ),
                         fluidRow(
                           box(title = textOutput("InjFatLossByHourChart"),
-                              solidHeader = TRUE, status = "primary",width = 12,plotOutput("inj_fat_loss_hour_line_comp_state")
+                              solidHeader = TRUE, status = "primary",width = 12, height=825,
+                              plotOutput("inj_fat_loss_hour_line_comp_state", height=750)
                           )
                         )
                       )
@@ -369,78 +377,79 @@ ui <- dashboardPage(
             
       ),
       tabItem("tornado_damage",
-              column(width=3,
-                h2("Illinois Counties Most Hit By Tornados: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+            fluidRow(width=12,height=1900, 
+              column(width=3,height=1900, style="padding-right:0px; padding-left:0px;",
+                box(width=12,
+                  h2("Illinois Counties Most Hit By Tornadoes: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
-                box(title = "Most Hit Counties",
-                    solidHeader = TRUE, status = "primary",width = 12,dataTableOutput("most_hit_counties")),
-                box(title = "Most Hit Counties",
-                    solidHeader = TRUE, status = "primary",width = 12,plotOutput("most_hit_counties_bar")
-                    
-                )
-              ),
-              column(width = 3,
-                h2("Most Dangerous Places During Tornadoes in Illinois", style="text-align:center; font-size:40px; background-color: black; color: white;
-                                           padding-top:10px; padding-bottom:10px"),
-                fluidRow(width=12,
-                  box(width=12, status="primary",
-                      selectInput("mon_grad","Select Month",
-                                    list(
-                                      "Spring" = c("Mar","Apr","May"),
-                                      "Summer" = c("Jun","Jul","Aug"),
-                                      "Fall" = c("Sep","Oct","Nov"),
-                                      "Winter" = c("Dec","Jan","Feb")
-                                    ))
-                      ),
-                  box(width=12,
-                    box(width=4,
-                      sliderInput("opacity", "Opacity:",
-                                  min = 0, max = 1,
-                                  value = 0.6, step = 0.05)
-                    ),
-                    box(width=4,
-                      sliderInput("radius", "Radius:",
-                                  min = 0, max = 50,
-                                  value = 16)
-                    ),
-                    box(width=4,
-                      sliderInput("blur", "Blur:",
-                                  min = 0, max = 30,
-                                  value = 14, step = 2)
-                      )
+                  box(title = "Most Hit Counties",
+                      solidHeader = TRUE, status = "primary",width = 12,dataTableOutput("most_hit_counties")),
+                  box(title = "Most Hit Counties", height=750,
+                      solidHeader = TRUE, status = "primary",width = 12,plotOutput("most_hit_counties_bar", height=650)
                   )
-                ),
-                box(width=12,status = "primary",height=925,
-                    leafletOutput("heat", height=850)
                 )
               ),
-              column(width=3,
-                h2("Most Destructive Tornados in Illinois: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
-                                           padding-top:10px; padding-bottom:10px"),
-                box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12, height=900,
-                    leafletOutput("topDestructive", height=800)
-                ),
-                box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12,
-                    dataTableOutput("topDestructiveTable")
+              column(width = 3, height=1900, style="padding-right:0px; padding-left:0px;",
+               box(width=12,
+                  h2("Most Dangerous Places During Tornadoes in Illinois", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                             padding-top:10px; padding-bottom:10px"),
+                  fluidRow(width=12,
+                    box(width=12, status="primary",
+                        selectInput("mon_grad","Select Month",
+                          list(
+                            "Spring" = c("Mar","Apr","May"), "Summer" = c("Jun","Jul","Aug"), "Fall" = c("Sep","Oct","Nov"),"Winter" = c("Dec","Jan","Feb")
+                          ))
+                        ),
+                    box(width=12,
+                      box(width=4,
+                        sliderInput("opacity", "Opacity:", min = 0, max = 1, value = 0.6, step = 0.05)
+                      ),
+                      box(width=4,
+                        sliderInput("radius", "Radius:",min = 0, max = 50,value = 16)
+                      ),
+                      box(width=4,
+                        sliderInput("blur", "Blur:",min = 0, max = 30,value = 14, step = 2)
+                        )
+                    )
+                  ),
+                  box(width=12,status = "primary",height=1550,
+                      leafletOutput("heat", height=1500)
+                  )
+                )
+              ) # end column
+              ,
+              column(width=3,height=1900,style="padding-right:0px; padding-left:0px;",
+                box(width=12, style="padding-right:0px; padding-left:0px;",
+                  h2("Most Destructive Tornadoes in Illinois: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                             padding-top:10px; padding-bottom:10px"),
+                  box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12, height=1100,
+                      leafletOutput("topDestructive", height=1050)
+                  ),
+                  box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12,
+                      dataTableOutput("topDestructiveTable")
+                  )
                 )
               ), # end of column
-              column(width=3,
-                h2("Tornados by Distance From Chicago: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
-                                           padding-top:10px; padding-bottom:10px"),
-                box(title = "Tornadoes by Distance From Chicago", solidHeader = TRUE, status = "primary",width = 12,
-                    radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
-                                 choiceNames = list(
-                                   "Numaric Values",
-                                   "Percentages"
-                                 ),
-                                 choiceValues = list(
-                                   "numb", "perc"
-                                 )),
-                    dataTableOutput("table_per_dist")),
-                box( title = "Tornados By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 12,
-                     plotOutput("stacked_bar_per_dist")
+              column(width=3,height=1900, style="padding-right:0px; padding-left:0px;",
+                box(width=12,
+                  h2("Tornadoes by Distance From Chicago: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
+                                             padding-top:10px; padding-bottom:10px"),
+                  box(title = "Tornadoes by Distance From Chicago", solidHeader = TRUE, status = "primary",width = 12,
+                      radioButtons("table_by_dist_view", "Choose one:",  inline = TRUE,
+                                   choiceNames = list(
+                                     "Numaric Values",
+                                     "Percentages"
+                                   ),
+                                   choiceValues = list(
+                                     "numb", "perc"
+                                   )),
+                      dataTableOutput("table_per_dist")),
+                  box( title = "Tornadoes By Distance from Chicago", solidHeader = TRUE, status = "primary", width = 12, height=1150,
+                       plotOutput("stacked_bar_per_dist", height=1100)
+                  )
                 )
               )
+            ) # end fluid row
       ), # end tab item
       tabItem("tornado_tracks",
               div(class="outer",
@@ -1157,7 +1166,7 @@ server <- function(input, output) {
  
   #### Illinois-specific charts and tables
  
-  # Calculates Tornados By Distance to Chicago (doesn't make sense for comparison for states) 
+  # Calculates Tornadoes By Distance to Chicago (doesn't make sense for comparison for states) 
   output$table_per_dist<- DT::renderDataTable(
     DT::datatable({
       
@@ -1225,7 +1234,7 @@ server <- function(input, output) {
     options = list(pageLength = 24))
   )
   
-  # Calculates Tornados By Distance to Chicago (doesn't make sense for comparison for states) 
+  # Calculates Tornadoes By Distance to Chicago (doesn't make sense for comparison for states) 
   output$stacked_bar_per_dist<- renderPlot({
     temp <- allData %>% filter(st == "IL", elat != 0.0, slat != 0.0, slon != 0.0, elon != 0.0)
     latlong <- temp[, c("slon","slat")]
@@ -1396,8 +1405,6 @@ server <- function(input, output) {
       temp <- temp[,colsToInclude]
      
       # Format the numbers with the commas
-      temp <- temp %>% mutate(avg_loss = formatC(round(avg_loss), format = "f", big.mark = ",", drop0trailing = TRUE))
-      temp <- temp %>% mutate(our_top = formatC(round(our_top), format = "f", big.mark = ",", drop0trailing = TRUE))
       
       names(temp)[names(temp)=="yr"] <- "Year"
       names(temp)[names(temp)=="fulldate"] <- "Date"
@@ -1412,7 +1419,7 @@ server <- function(input, output) {
       temp <- as.data.frame(temp)
     },
     rownames=FALSE,
-    options = list(pageLength = 10,columnDefs = list(list(className = 'dt-right', targets = 4:8)))
+    options = list(pageLength = 10)
     )
   )
   
