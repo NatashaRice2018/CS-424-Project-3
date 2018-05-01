@@ -1,3 +1,6 @@
+.shiny-input-container:not(.shiny-input-container-inline){
+  width:500px;
+}
 
 .slider-animate-container{
   margin-top:0px;

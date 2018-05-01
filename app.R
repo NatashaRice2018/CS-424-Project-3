@@ -90,23 +90,23 @@ ui <- dashboardPage(
   (
     width= 650,
     sidebarMenu(
-      menuItem("About", tabName="about"),
-      menuItem("Tornado Facts", tabName="number_of_tornadoes"),
+      menuItem("National Tornado Facts", tabName="number_of_tornadoes"),
+      menuItem("National Tornado Track Details", tabName="tornado_tracks"),
       menuItem("Illinois Tornado Facts", tabName="tornado_damage"),
-      menuItem("Tornado Tracks", tabName="tornado_tracks"),
+      menuItem("About", tabName="about"),
       menuItem("Time",
                box(
-                 selectInput("Time", "12 hour am/pm time or 24 hour time ", choices=t, selected = '24 hour'), width=650
+                 selectInput("Time", NULL, choices=t, selected = '24 hour'), width=650
                )
       ),
       menuItem("Unit",
                box(
-                 selectInput("Unit","Miles or Kilometers", choices=c("Miles","Kilometers"), selected = 'Miles'), width=650
+                 selectInput("Unit", NULL, choices=c("Miles","Kilometers"), selected = 'Miles'), width=650
                )
       ),
       menuItem("Comparison State",
                box(
-                 selectInput("comparisonState", "State", nameToAbb, selected = "Texas"), width=650
+                 selectInput("comparisonState", NULL, nameToAbb, selected = "Texas"), width=650, collapsible = FALSE
                )
       )
     )
@@ -118,8 +118,14 @@ ui <- dashboardPage(
     
     tabItems(
       tabItem("about",
-              h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu"),
-              a("Link to project website", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/")
+              div(style="background:white; width:3000px; height:2000px",
+                h1("'You Spin Me Round' is a data visualization project of tornados in the United States from 1950 to 2016, with a special focus on Illinois.", style="font-size:80px"),
+                h1("This project was created in partial fulfillment of Prof. Andrew Johnson's CS 424: Visualization and Visual Analytics course at the University of Illinois at Chicago.", style="font-size:80px"),
+                h1("Authors: Yang Hao, Guillermo Rojas Hernandez, Natasha Rice, Siddharth Basu", style="font-size:60px"),
+                h1(a("View our Project Write-Up and Documentation", href="https://siddharth-basu.github.io/CS424_Project3_Website.io-/",style="font-size:60px")),
+                h1(a("View our Code on Github", href="https://github.com/NatashaRice2018/CS-424-Project-3/", style="font-size:60px")),
+                h1(a("View the Course Website for CS 424", href="https://www.evl.uic.edu/aej/424/index.html", style="font-size:60px"))
+              )
       ),
       tabItem("number_of_tornadoes",
           fluidRow(width=12,
@@ -411,10 +417,10 @@ ui <- dashboardPage(
               column(width=3,
                 h2("Most Destructive Tornados in Illinois: 1950-2016", style="text-align:center; font-size:40px; background-color: black; color: white;
                                            padding-top:10px; padding-bottom:10px"),
-                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12, height=900,
+                box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12, height=900,
                     leafletOutput("topDestructive", height=800)
                 ),
-                box(title = "Top Destructive Tornados by Time and Power", solidHeader = TRUE, status = "primary", width = 12,
+                box(title = "Top 10 Destructive Tornadoes", solidHeader = TRUE, status = "primary", width = 12,
                     dataTableOutput("topDestructiveTable")
                 )
               ), # end of column
@@ -447,8 +453,8 @@ ui <- dashboardPage(
                   leafletOutput("map", width="100%", height="100%"),
                   # Shiny versions prior to 0.11 should use class = "modal" instead.
                   absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
-                                draggable = TRUE, top = 60, left = "auto", right = 20, bottom = "auto",
-                                width = 500, height = "auto",
+                                draggable = TRUE, top = 100, left = "auto", right = 20, bottom = "auto",
+                                width = "auto", height = "auto",
                                 
                                 h2("Tornado Views"),
                                 selectInput("map", "Map Type", mapView, selected = "Plain"),
@@ -1265,7 +1271,7 @@ server <- function(input, output) {
       most_hit_counties <- as.data.frame(most_hit_counties)
       most_hit_counties
     },
-    options = list(pageLength = 12)
+    options = list(pageLength = 16)
     )
   )
   
